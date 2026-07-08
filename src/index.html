@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雍贤山庐 7-1004 装修预算总表</title>
+<style>
+:root{
+  --dark:#214E3B; --green:#376B55; --gold:#C79A52; --red:#C95252;
+  --bg:#F4F7F5; --card:#FFFFFF; --line:#E3EAE5; --ink:#24312B; --muted:#6D7771;
+  --paid-bg:#E5F3E9; --budget-bg:#FBF7EF; --unpaid-bg:#FCE8E6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+  background:linear-gradient(135deg,#EDF4EF 0%,#F4F7F5 100%);
+  color:var(--ink); line-height:1.5; padding-bottom:60px; overflow-x:hidden;
+}
+/* ===== 顶部标题 ===== */
+header{
+  background:linear-gradient(120deg,var(--dark),var(--green));
+  color:#fff; padding:32px 24px; position:relative; overflow:hidden;
+  box-shadow:0 4px 20px rgba(33,78,59,.25);
+}
+header::after{
+  content:""; position:absolute; top:-50%; right:-10%; width:400px; height:400px;
+  background:radial-gradient(circle,rgba(199,154,82,.25),transparent 70%);
+  animation:float 8s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,20px)}}
+header h1{font-size:26px; font-weight:700; letter-spacing:1px; animation:slideDown .8s cubic-bezier(.2,.8,.2,1)}
+header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:slideDown .8s .1s backwards}
+@keyframes slideDown{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
+/* ===== KPI 卡片 ===== */
+.kpis{
+  display:grid; grid-template-columns:repeat(6,1fr); gap:14px;
+  max-width:1280px; margin:-30px auto 0; padding:0 24px; position:relative; z-index:5;
+}
+.kpi{
+  background:var(--card); border-radius:16px; padding:18px 16px;
+  box-shadow:0 6px 20px rgba(33,78,59,.08); border:1px solid var(--line);
+  opacity:0; transform:translateY(30px); animation:pop .6s forwards;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  position:relative; overflow:hidden;
+}
+.kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent,var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.kpi:hover::before{transform:scaleX(1)}
+.kpi:hover{transform:translateY(-8px) scale(1.03); box-shadow:0 18px 36px rgba(33,78,59,.18)}
+.kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.12s}
+.kpi:nth-child(3){animation-delay:.19s}.kpi:nth-child(4){animation-delay:.26s}
+.kpi:nth-child(5){animation-delay:.33s}.kpi:nth-child(6){animation-delay:.40s}
+@keyframes pop{to{opacity:1;transform:translateY(0)}}
+.kpi .label{font-size:12px; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:5px}
+.kpi .dot{width:8px;height:8px;border-radius:50%}
+.kpi .value{font-size:22px; font-weight:700; color:var(--dark)}
+.kpi .value.money::before{content:"¥"; font-size:14px; opacity:.6; margin-right:1px}
+/* ===== 工具条 ===== */
+.toolbar{
+  max-width:1280px; margin:26px auto 14px; padding:0 24px;
+  display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+}
+.search{
+  flex:1; min-width:200px; padding:11px 16px; border:1px solid var(--line); border-radius:10px;
+  font-size:14px; background:#fff; transition:.2s; outline:none;
+}
+.search:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.15)}
+.btn{
+  padding:11px 18px; border:none; border-radius:10px; cursor:pointer; font-size:14px;
+  font-weight:600; transition:.2s; font-family:inherit;
+}
+.btn-primary{background:var(--dark); color:#fff}
+.btn-primary:hover{background:var(--green); transform:translateY(-2px); box-shadow:0 6px 16px rgba(33,78,59,.25)}
+.btn-ghost{background:#fff; color:var(--dark); border:1px solid var(--line)}
+.btn-ghost:hover{background:var(--bg)}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:#fff;transition:.2s}
+.chip:hover{border-color:var(--green)}
+.chip.active{background:var(--green);color:#fff;border-color:var(--green)}
+/* ===== 阶段块 ===== */
+.stage{
+  max-width:1280px; margin:0 auto 22px; padding:0 24px;
+  opacity:0; transform:translateY(24px);
+}
+.stage.in{animation:rise .6s forwards}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+.stage-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:linear-gradient(100deg,var(--dark) 0%,var(--green) 60%,#2f6650 100%); color:#fff;
+  padding:14px 22px; border-radius:14px 14px 0 0; cursor:pointer;
+  box-shadow:0 4px 14px rgba(33,78,59,.18); position:relative; overflow:hidden;
+  transition:box-shadow .3s, transform .3s;
+}
+.stage-head::before{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(100deg,transparent 40%,rgba(199,154,82,.18) 100%);
+  opacity:0; transition:opacity .35s;
+}
+.stage-head:hover{box-shadow:0 8px 22px rgba(33,78,59,.28)}
+.stage-head:hover::before{opacity:1}
+.stage-head h2{font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; letter-spacing:.5px; z-index:1; text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.stage-head .caret{transition:transform .3s}
+.stage.collapsed .caret{transform:rotate(-90deg)}
+.stage-sum{font-size:13px; color:#fff; display:flex; gap:16px; flex-wrap:wrap; z-index:1}
+.stage-sum span{background:rgba(255,255,255,.14); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px)}
+.stage-sum b{color:#FFE1A6; font-weight:700}
+.table-wrap{background:#fff; border:1px solid var(--line); border-top:none; border-radius:0 0 14px 14px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 6px 20px rgba(33,78,59,.06)}
+/* 回款节点：区别于普通节点的配色 */
+.stage.rebate .stage-head{background:linear-gradient(100deg,#7A5B12 0%,#A97E22 60%,#C79A52 100%)}
+.stage.rebate thead th{background:#8A6A1C}
+.stage.rebate td.rebate .cell{color:#A97112; font-weight:700}
+.stage.rebate .stage-sum b{color:#FFF1D0}
+.stage.collapsed .table-wrap{max-height:0!important; opacity:0; border:none}
+table{width:100%; border-collapse:collapse; font-size:13px}
+thead th{
+  background:var(--dark); color:#fff; font-weight:600; padding:12px 12px; text-align:left;
+  position:sticky; top:0; white-space:nowrap; font-size:12px;
+}
+thead th:first-child{padding-left:22px}
+thead th.thmoney{text-align:right; padding-right:22px}
+thead th.thcenter{text-align:center}
+tbody td:first-child .cell{margin-left:12px}
+tbody td.money .cell{margin-right:12px}
+tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:#F0F6F2}
+tbody tr:hover .cell{background:transparent}
+.cell{
+  padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
+  border:2px solid transparent; border-radius:6px; margin:2px;
+}
+.cell:hover{background:#EDF4EF}
+.cell:focus{background:#fff; border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.12)}
+.cell.saved{animation:flash .7s}
+@keyframes flash{0%{background:#C6EFCE}100%{background:transparent}}
+td.money .cell{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
+td.budget .cell{background:var(--budget-bg)}
+td.paid .cell{color:var(--green); font-weight:600}
+td.unpaid .cell{color:var(--red); font-weight:600}
+.status-badge{
+  display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
+  cursor:pointer; user-select:none; transition:.2s;
+}
+.status-badge.done{background:#C6EFCE; color:#227A3D}
+.status-badge.todo{background:#FFE7C2; color:#B9600F}
+.status-badge:hover{transform:scale(1.08)}
+/* ===== toast ===== */
+#toast{
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--dark); color:#fff; padding:12px 22px; border-radius:30px; font-size:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0; transition:.4s cubic-bezier(.2,.8,.2,1); z-index:99;
+}
+#toast.show{transform:translateX(-50%) translateY(0); opacity:1}
+/* ===== back to top ===== */
+/* ===== 悬浮操作按钮组 ===== */
+.fab{position:fixed;right:22px;border-radius:50%;width:48px;height:48px;border:none;cursor:pointer;font-size:20px;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:transform .3s,opacity .3s,box-shadow .3s;z-index:50;display:flex;align-items:center;justify-content:center}
+.fab.show{opacity:1;pointer-events:auto}
+.fab:active{transform:scale(.9)}
+#top{bottom:26px;background:var(--gold)}
+#top:hover{transform:translateY(-4px) rotate(360deg);transition:transform .5s,opacity .3s}
+#toStart{bottom:84px;background:var(--dark);font-size:22px}
+#toStart:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(33,78,59,.4)}
+.fab .tip{position:absolute;right:56px;white-space:nowrap;background:rgba(36,49,43,.92);color:#fff;font-size:12px;padding:5px 10px;border-radius:8px;opacity:0;transform:translateX(6px);transition:.25s;pointer-events:none}
+.fab:hover .tip{opacity:1;transform:translateX(0)}
+@media(hover:none){.fab .tip{display:none}}
+/* ===== progress bar ===== */
+.progress-wrap{max-width:1280px;margin:0 auto 8px;padding:0 24px}
+.progress-track{height:10px;background:#E3EAE5;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));width:0;border-radius:10px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+/* ===== 图表区 ===== */
+.charts{max-width:1280px;margin:20px auto 8px;padding:0 24px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
+.chart-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 6px 20px rgba(33,78,59,.07);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
+.chart-card.in{animation:rise .7s forwards}
+.chart-card:hover{box-shadow:0 14px 30px rgba(33,78,59,.14);transform:translateY(-4px)}
+.chart-card h3{font-size:15px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
+.chart-card h3::before{content:"";width:5px;height:16px;background:var(--gold);border-radius:3px}
+.chart-card canvas{width:100%;display:block}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted);justify-content:center}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+@media(max-width:900px){.charts{grid-template-columns:1fr}}
+.progress-label{font-size:12px;color:var(--muted);margin-top:5px;text-align:right}
+/* ===== 响应式 ===== */
+@media(max-width:900px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .charts{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  header{padding:24px 16px}
+  header h1{font-size:19px}
+  header p{font-size:12px}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:10px;margin-top:-22px;padding:0 14px}
+  .kpi{padding:14px 12px;border-radius:13px}
+  .kpi .value{font-size:19px}
+  .kpi .label{font-size:11px}
+  .progress-wrap,.charts,.toolbar,.stage,.footer{padding-left:14px;padding-right:14px}
+  .toolbar{gap:8px}
+  .search{min-width:0;flex:1 1 100%}
+  .chip{flex:1;text-align:center}
+  .btn{flex:1;padding:10px 8px;font-size:13px}
+  /* 表格横向滚动，保留所有列 */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .stage:not(.collapsed) .table-wrap{max-height:none}
+  table{min-width:680px}
+  .stage-head{padding:12px 16px;flex-wrap:wrap;gap:8px}
+  .stage-head h2{font-size:15px}
+  .stage-sum{font-size:11px;gap:6px}
+  .stage-sum span{padding:2px 8px}
+  .cell{font-size:12px;padding:9px 8px;min-height:40px}
+  thead th{font-size:11px;padding:10px 8px}
+  thead th:first-child{padding-left:14px}
+  /* 触摸友好：状态徽章与按钮更大点击区 */
+  .status-badge{padding:6px 14px;font-size:12px}
+  .fab{width:52px;height:52px}
+  #toStart{bottom:88px}
+}
+@media(max-width:600px) and (hover:none){
+  .kpi:active{transform:scale(.98)}
+}
+.hidden{display:none!important}
+.footer{max-width:1280px;margin:30px auto 0;padding:0 24px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>雍贤山庐 7-1004 装修预算总表</h1>
+  <p>127㎡ 毛坯住宅 · 实时可编辑 · 数据自动保存到本地浏览器</p>
+</header>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+  <div class="progress-label" id="progLabel"></div>
+</div>
+
+<div class="charts">
+  <div class="chart-card">
+    <h3>各阶段 预算 vs 已付款</h3>
+    <canvas id="barChart" height="300"></canvas>
+    <div class="legend">
+      <span><i style="background:#C79A52"></i>预算款</span>
+      <span><i style="background:#376B55"></i>已付款</span>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3>整体资金构成</h3>
+    <canvas id="donutChart" height="300"></canvas>
+    <div class="legend" id="donutLegend"></div>
+  </div>
+</div>
+
+
+<div class="toolbar">
+  <input class="search" id="search" placeholder="🔍 搜索项目名称 / 类别 / 空间 / 备注…">
+  <span class="chip active" data-f="all">全部</span>
+  <span class="chip" data-f="done">已完成</span>
+  <span class="chip" data-f="todo">未完成</span>
+  <button class="btn btn-ghost" id="expandAll">展开/收起全部</button>
+  <button class="btn btn-ghost" id="exportBtn">⬇ 导出数据</button>
+  <button class="btn btn-ghost" id="importBtn">⬆ 导入数据</button>
+  <button class="btn btn-primary" id="reset">恢复初始数据</button>
+  <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+</div>
+
+<div id="stages"></div>
+
+<div class="footer">共 <span id="nodeCount"></span> 个节点 · 点击任意单元格即可编辑，修改自动保存 · 点状态标签可切换完成状态</div>
+
+<button id="toStart" class="fab" title="回到流程开始">⚑<span class="tip">回到流程开始</span></button>
+<button id="top" class="fab">↑<span class="tip">回到顶部</span></button>
+<div id="toast"></div>
+
+<script>
+/*
+ * anime.js v3.2.2
+ * (c) 2023 Julian Garnier
+ * Released under the MIT license
+ * animejs.com
+ */
+
+!function(n,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define(e):n.anime=e()}(this,function(){"use strict";var i={update:null,begin:null,loopBegin:null,changeBegin:null,change:null,changeComplete:null,loopComplete:null,complete:null,loop:1,direction:"normal",autoplay:!0,timelineOffset:0},M={duration:1e3,delay:0,endDelay:0,easing:"easeOutElastic(1, .5)",round:0},j=["translateX","translateY","translateZ","rotate","rotateX","rotateY","rotateZ","scale","scaleX","scaleY","scaleZ","skew","skewX","skewY","perspective","matrix","matrix3d"],l={CSS:{},springs:{}};function C(n,e,t){return Math.min(Math.max(n,e),t)}function u(n,e){return-1<n.indexOf(e)}function o(n,e){return n.apply(null,e)}var w={arr:function(n){return Array.isArray(n)},obj:function(n){return u(Object.prototype.toString.call(n),"Object")},pth:function(n){return w.obj(n)&&n.hasOwnProperty("totalLength")},svg:function(n){return n instanceof SVGElement},inp:function(n){return n instanceof HTMLInputElement},dom:function(n){return n.nodeType||w.svg(n)},str:function(n){return"string"==typeof n},fnc:function(n){return"function"==typeof n},und:function(n){return void 0===n},nil:function(n){return w.und(n)||null===n},hex:function(n){return/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(n)},rgb:function(n){return/^rgb/.test(n)},hsl:function(n){return/^hsl/.test(n)},col:function(n){return w.hex(n)||w.rgb(n)||w.hsl(n)},key:function(n){return!i.hasOwnProperty(n)&&!M.hasOwnProperty(n)&&"targets"!==n&&"keyframes"!==n}};function d(n){n=/\(([^)]+)\)/.exec(n);return n?n[1].split(",").map(function(n){return parseFloat(n)}):[]}function c(r,t){var n=d(r),e=C(w.und(n[0])?1:n[0],.1,100),a=C(w.und(n[1])?100:n[1],.1,100),o=C(w.und(n[2])?10:n[2],.1,100),n=C(w.und(n[3])?0:n[3],.1,100),u=Math.sqrt(a/e),i=o/(2*Math.sqrt(a*e)),c=i<1?u*Math.sqrt(1-i*i):0,s=i<1?(i*u-n)/c:-n+u;function f(n){var e=t?t*n/1e3:n,e=i<1?Math.exp(-e*i*u)*(+Math.cos(c*e)+s*Math.sin(c*e)):(1+s*e)*Math.exp(-e*u);return 0===n||1===n?n:1-e}return t?f:function(){var n=l.springs[r];if(n)return n;for(var e=0,t=0;;)if(1===f(e+=1/6)){if(16<=++t)break}else t=0;return n=e*(1/6)*1e3,l.springs[r]=n}}function q(e){return void 0===e&&(e=10),function(n){return Math.ceil(C(n,1e-6,1)*e)*(1/e)}}var H=function(b,e,M,t){if(0<=b&&b<=1&&0<=M&&M<=1){var x=new Float32Array(11);if(b!==e||M!==t)for(var n=0;n<11;++n)x[n]=k(.1*n,b,M);return function(n){return b===e&&M===t||0===n||1===n?n:k(r(n),e,t)}}function r(n){for(var e=0,t=1;10!==t&&x[t]<=n;++t)e+=.1;var r=e+.1*((n-x[--t])/(x[t+1]-x[t])),a=O(r,b,M);if(.001<=a){for(var o=n,u=r,i=b,c=M,s=0;s<4;++s){var f=O(u,i,c);if(0===f)return u;u-=(k(u,i,c)-o)/f}return u}if(0===a)return r;for(var l,d,p=n,h=e,g=e+.1,m=b,v=M,y=0;0<(l=k(d=h+(g-h)/2,m,v)-p)?g=d:h=d,1e-7<Math.abs(l)&&++y<10;);return d}};function r(n,e){return 1-3*e+3*n}function k(n,e,t){return((r(e,t)*n+(3*t-6*e))*n+3*e)*n}function O(n,e,t){return 3*r(e,t)*n*n+2*(3*t-6*e)*n+3*e}e={linear:function(){return function(n){return n}}},t={Sine:function(){return function(n){return 1-Math.cos(n*Math.PI/2)}},Expo:function(){return function(n){return n?Math.pow(2,10*n-10):0}},Circ:function(){return function(n){return 1-Math.sqrt(1-n*n)}},Back:function(){return function(n){return n*n*(3*n-2)}},Bounce:function(){return function(n){for(var e,t=4;n<((e=Math.pow(2,--t))-1)/11;);return 1/Math.pow(4,3-t)-7.5625*Math.pow((3*e-2)/22-n,2)}},Elastic:function(n,e){void 0===e&&(e=.5);var t=C(n=void 0===n?1:n,1,10),r=C(e,.1,2);return function(n){return 0===n||1===n?n:-t*Math.pow(2,10*(n-1))*Math.sin((n-1-r/(2*Math.PI)*Math.asin(1/t))*(2*Math.PI)/r)}}},["Quad","Cubic","Quart","Quint"].forEach(function(n,e){t[n]=function(){return function(n){return Math.pow(n,e+2)}}}),Object.keys(t).forEach(function(n){var r=t[n];e["easeIn"+n]=r,e["easeOut"+n]=function(e,t){return function(n){return 1-r(e,t)(1-n)}},e["easeInOut"+n]=function(e,t){return function(n){return n<.5?r(e,t)(2*n)/2:1-r(e,t)(-2*n+2)/2}},e["easeOutIn"+n]=function(e,t){return function(n){return n<.5?(1-r(e,t)(1-2*n))/2:(r(e,t)(2*n-1)+1)/2}}});var e,t,s=e;function P(n,e){if(w.fnc(n))return n;var t=n.split("(")[0],r=s[t],a=d(n);switch(t){case"spring":return c(n,e);case"cubicBezier":return o(H,a);case"steps":return o(q,a);default:return o(r,a)}}function a(n){try{return document.querySelectorAll(n)}catch(n){}}function I(n,e){for(var t,r=n.length,a=2<=arguments.length?e:void 0,o=[],u=0;u<r;u++)u in n&&(t=n[u],e.call(a,t,u,n))&&o.push(t);return o}function f(n){return n.reduce(function(n,e){return n.concat(w.arr(e)?f(e):e)},[])}function p(n){return w.arr(n)?n:(n=w.str(n)?a(n)||n:n)instanceof NodeList||n instanceof HTMLCollection?[].slice.call(n):[n]}function h(n,e){return n.some(function(n){return n===e})}function g(n){var e,t={};for(e in n)t[e]=n[e];return t}function x(n,e){var t,r=g(n);for(t in n)r[t]=(e.hasOwnProperty(t)?e:n)[t];return r}function D(n,e){var t,r=g(n);for(t in e)r[t]=(w.und(n[t])?e:n)[t];return r}function V(n){var e,t,r,a,o,u,i;return w.rgb(n)?(e=/rgb\((\d+,\s*[\d]+,\s*[\d]+)\)/g.exec(t=n))?"rgba("+e[1]+",1)":t:w.hex(n)?(e=(e=n).replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,function(n,e,t,r){return e+e+t+t+r+r}),e=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(e),"rgba("+parseInt(e[1],16)+","+parseInt(e[2],16)+","+parseInt(e[3],16)+",1)"):w.hsl(n)?(t=/hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(t=n)||/hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*([\d.]+)\)/g.exec(t),n=parseInt(t[1],10)/360,u=parseInt(t[2],10)/100,i=parseInt(t[3],10)/100,t=t[4]||1,0==u?r=a=o=i:(r=c(u=2*i-(i=i<.5?i*(1+u):i+u-i*u),i,n+1/3),a=c(u,i,n),o=c(u,i,n-1/3)),"rgba("+255*r+","+255*a+","+255*o+","+t+")"):void 0;function c(n,e,t){return t<0&&(t+=1),1<t&&--t,t<1/6?n+6*(e-n)*t:t<.5?e:t<2/3?n+(e-n)*(2/3-t)*6:n}}function B(n){n=/[+-]?\d*\.?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(n);if(n)return n[1]}function m(n,e){return w.fnc(n)?n(e.target,e.id,e.total):n}function v(n,e){return n.getAttribute(e)}function y(n,e,t){var r,a,o;return h([t,"deg","rad","turn"],B(e))?e:(r=l.CSS[e+t],w.und(r)?(a=document.createElement(n.tagName),(n=n.parentNode&&n.parentNode!==document?n.parentNode:document.body).appendChild(a),a.style.position="absolute",a.style.width=100+t,o=100/a.offsetWidth,n.removeChild(a),n=o*parseFloat(e),l.CSS[e+t]=n):r)}function $(n,e,t){var r;if(e in n.style)return r=e.replace(/([a-z])([A-Z])/g,"$1-$2").toLowerCase(),e=n.style[e]||getComputedStyle(n).getPropertyValue(r)||"0",t?y(n,e,t):e}function b(n,e){return w.dom(n)&&!w.inp(n)&&(!w.nil(v(n,e))||w.svg(n)&&n[e])?"attribute":w.dom(n)&&h(j,e)?"transform":w.dom(n)&&"transform"!==e&&$(n,e)?"css":null!=n[e]?"object":void 0}function W(n){if(w.dom(n)){for(var e,t=n.style.transform||"",r=/(\w+)\(([^)]*)\)/g,a=new Map;e=r.exec(t);)a.set(e[1],e[2]);return a}}function X(n,e,t,r){var a=u(e,"scale")?1:0+(u(a=e,"translate")||"perspective"===a?"px":u(a,"rotate")||u(a,"skew")?"deg":void 0),o=W(n).get(e)||a;return t&&(t.transforms.list.set(e,o),t.transforms.last=e),r?y(n,o,r):o}function T(n,e,t,r){switch(b(n,e)){case"transform":return X(n,e,r,t);case"css":return $(n,e,t);case"attribute":return v(n,e);default:return n[e]||0}}function E(n,e){var t=/^(\*=|\+=|-=)/.exec(n);if(!t)return n;var r=B(n)||0,a=parseFloat(e),o=parseFloat(n.replace(t[0],""));switch(t[0][0]){case"+":return a+o+r;case"-":return a-o+r;case"*":return a*o+r}}function Y(n,e){var t;return w.col(n)?V(n):/\s/g.test(n)?n:(t=(t=B(n))?n.substr(0,n.length-t.length):n,e?t+e:t)}function F(n,e){return Math.sqrt(Math.pow(e.x-n.x,2)+Math.pow(e.y-n.y,2))}function Z(n){for(var e,t=n.points,r=0,a=0;a<t.numberOfItems;a++){var o=t.getItem(a);0<a&&(r+=F(e,o)),e=o}return r}function G(n){if(n.getTotalLength)return n.getTotalLength();switch(n.tagName.toLowerCase()){case"circle":return 2*Math.PI*v(n,"r");case"rect":return 2*v(t=n,"width")+2*v(t,"height");case"line":return F({x:v(t=n,"x1"),y:v(t,"y1")},{x:v(t,"x2"),y:v(t,"y2")});case"polyline":return Z(n);case"polygon":return e=n.points,Z(n)+F(e.getItem(e.numberOfItems-1),e.getItem(0))}var e,t}function Q(n,e){var e=e||{},n=e.el||function(n){for(var e=n.parentNode;w.svg(e)&&w.svg(e.parentNode);)e=e.parentNode;return e}(n),t=n.getBoundingClientRect(),r=v(n,"viewBox"),a=t.width,t=t.height,e=e.viewBox||(r?r.split(" "):[0,0,a,t]);return{el:n,viewBox:e,x:+e[0],y:+e[1],w:a,h:t,vW:e[2],vH:e[3]}}function z(n,e){var t=/[+-]?\d*\.?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g,r=Y(w.pth(n)?n.totalLength:n,e)+"";return{original:r,numbers:r.match(t)?r.match(t).map(Number):[0],strings:w.str(n)||e?r.split(t):[]}}function A(n){return I(n?f(w.arr(n)?n.map(p):p(n)):[],function(n,e,t){return t.indexOf(n)===e})}function _(n){var t=A(n);return t.map(function(n,e){return{target:n,id:e,total:t.length,transforms:{list:W(n)}}})}function R(e){for(var t=I(f(e.map(function(n){return Object.keys(n)})),function(n){return w.key(n)}).reduce(function(n,e){return n.indexOf(e)<0&&n.push(e),n},[]),a={},n=0;n<t.length;n++)!function(n){var r=t[n];a[r]=e.map(function(n){var e,t={};for(e in n)w.key(e)?e==r&&(t.value=n[e]):t[e]=n[e];return t})}(n);return a}function J(n,e){var t,r=[],a=e.keyframes;for(t in e=a?D(R(a),e):e)w.key(t)&&r.push({name:t,tweens:function(n,t){var e,r=g(t),a=(/^spring/.test(r.easing)&&(r.duration=c(r.easing)),w.arr(n)&&(2===(e=n.length)&&!w.obj(n[0])?n={value:n}:w.fnc(t.duration)||(r.duration=t.duration/e)),w.arr(n)?n:[n]);return a.map(function(n,e){n=w.obj(n)&&!w.pth(n)?n:{value:n};return w.und(n.delay)&&(n.delay=e?0:t.delay),w.und(n.endDelay)&&(n.endDelay=e===a.length-1?t.endDelay:0),n}).map(function(n){return D(n,r)})}(e[t],n)});return r}function K(i,c){var s;return i.tweens.map(function(n){var n=function(n,e){var t,r={};for(t in n){var a=m(n[t],e);w.arr(a)&&1===(a=a.map(function(n){return m(n,e)})).length&&(a=a[0]),r[t]=a}return r.duration=parseFloat(r.duration),r.delay=parseFloat(r.delay),r}(n,c),e=n.value,t=w.arr(e)?e[1]:e,r=B(t),a=T(c.target,i.name,r,c),o=s?s.to.original:a,u=w.arr(e)?e[0]:o,a=B(u)||B(a),r=r||a;return w.und(t)&&(t=o),n.from=z(u,r),n.to=z(E(t,u),r),n.start=s?s.end:0,n.end=n.start+n.delay+n.duration+n.endDelay,n.easing=P(n.easing,n.duration),n.isPath=w.pth(e),n.isPathTargetInsideSVG=n.isPath&&w.svg(c.target),n.isColor=w.col(n.from.original),n.isColor&&(n.round=1),s=n})}var U={css:function(n,e,t){return n.style[e]=t},attribute:function(n,e,t){return n.setAttribute(e,t)},object:function(n,e,t){return n[e]=t},transform:function(n,e,t,r,a){var o;r.list.set(e,t),e!==r.last&&!a||(o="",r.list.forEach(function(n,e){o+=e+"("+n+") "}),n.style.transform=o)}};function nn(n,u){_(n).forEach(function(n){for(var e in u){var t=m(u[e],n),r=n.target,a=B(t),o=T(r,e,a,n),t=E(Y(t,a||B(o)),o),a=b(r,e);U[a](r,e,t,n.transforms,!0)}})}function en(n,e){return I(f(n.map(function(o){return e.map(function(n){var e,t,r=o,a=b(r.target,n.name);if(a)return t=(e=K(n,r))[e.length-1],{type:a,property:n.name,animatable:r,tweens:e,duration:t.end,delay:e[0].delay,endDelay:t.endDelay}})})),function(n){return!w.und(n)})}function tn(n,e){function t(n){return n.timelineOffset||0}var r=n.length,a={};return a.duration=r?Math.max.apply(Math,n.map(function(n){return t(n)+n.duration})):e.duration,a.delay=r?Math.min.apply(Math,n.map(function(n){return t(n)+n.delay})):e.delay,a.endDelay=r?a.duration-Math.max.apply(Math,n.map(function(n){return t(n)+n.duration-n.endDelay})):e.endDelay,a}var rn=0;var N,S=[],an=("undefined"!=typeof document&&document.addEventListener("visibilitychange",function(){L.suspendWhenDocumentHidden&&(n()?N=cancelAnimationFrame(N):(S.forEach(function(n){return n._onDocumentVisibility()}),an()))}),function(){!(N||n()&&L.suspendWhenDocumentHidden)&&0<S.length&&(N=requestAnimationFrame(on))});function on(n){for(var e=S.length,t=0;t<e;){var r=S[t];r.paused?(S.splice(t,1),e--):(r.tick(n),t++)}N=0<t?requestAnimationFrame(on):void 0}function n(){return document&&document.hidden}function L(n){var c,s=0,f=0,l=0,d=0,p=null;function h(n){var e=window.Promise&&new Promise(function(n){return p=n});return n.finished=e}e=x(i,n=n=void 0===n?{}:n),t=J(r=x(M,n),n),n=_(n.targets),r=tn(t=en(n,t),r),a=rn,rn++;var e,t,r,a,k=D(e,{id:a,children:[],animatables:n,animations:t,duration:r.duration,delay:r.delay,endDelay:r.endDelay});h(k);function g(){var n=k.direction;"alternate"!==n&&(k.direction="normal"!==n?"normal":"reverse"),k.reversed=!k.reversed,c.forEach(function(n){return n.reversed=k.reversed})}function m(n){return k.reversed?k.duration-n:n}function o(){s=0,f=m(k.currentTime)*(1/L.speed)}function v(n,e){e&&e.seek(n-e.timelineOffset)}function y(e){for(var n=0,t=k.animations,r=t.length;n<r;){for(var a=t[n],o=a.animatable,u=a.tweens,i=u.length-1,c=u[i],i=(i&&(c=I(u,function(n){return e<n.end})[0]||c),C(e-c.start-c.delay,0,c.duration)/c.duration),s=isNaN(i)?1:c.easing(i),f=c.to.strings,l=c.round,d=[],p=c.to.numbers.length,h=void 0,g=0;g<p;g++){var m=void 0,v=c.to.numbers[g],y=c.from.numbers[g]||0,m=c.isPath?function(e,t,n){function r(n){return e.el.getPointAtLength(1<=t+(n=void 0===n?0:n)?t+n:0)}var a=Q(e.el,e.svg),o=r(),u=r(-1),i=r(1),c=n?1:a.w/a.vW,s=n?1:a.h/a.vH;switch(e.property){case"x":return(o.x-a.x)*c;case"y":return(o.y-a.y)*s;case"angle":return 180*Math.atan2(i.y-u.y,i.x-u.x)/Math.PI}}(c.value,s*v,c.isPathTargetInsideSVG):y+s*(v-y);!l||c.isColor&&2<g||(m=Math.round(m*l)/l),d.push(m)}var b=f.length;if(b)for(var h=f[0],M=0;M<b;M++){f[M];var x=f[M+1],w=d[M];isNaN(w)||(h+=x?w+x:w+" ")}else h=d[0];U[a.type](o.target,a.property,h,o.transforms),a.currentValue=h,n++}}function b(n){k[n]&&!k.passThrough&&k[n](k)}function u(n){var e=k.duration,t=k.delay,r=e-k.endDelay,a=m(n);if(k.progress=C(a/e*100,0,100),k.reversePlayback=a<k.currentTime,c){var o=a;if(k.reversePlayback)for(var u=d;u--;)v(o,c[u]);else for(var i=0;i<d;i++)v(o,c[i])}!k.began&&0<k.currentTime&&(k.began=!0,b("begin")),!k.loopBegan&&0<k.currentTime&&(k.loopBegan=!0,b("loopBegin")),a<=t&&0!==k.currentTime&&y(0),(r<=a&&k.currentTime!==e||!e)&&y(e),t<a&&a<r?(k.changeBegan||(k.changeBegan=!0,k.changeCompleted=!1,b("changeBegin")),b("change"),y(a)):k.changeBegan&&(k.changeCompleted=!0,k.changeBegan=!1,b("changeComplete")),k.currentTime=C(a,0,e),k.began&&b("update"),e<=n&&(f=0,k.remaining&&!0!==k.remaining&&k.remaining--,k.remaining?(s=l,b("loopComplete"),k.loopBegan=!1,"alternate"===k.direction&&g()):(k.paused=!0,k.completed||(k.completed=!0,b("loopComplete"),b("complete"),!k.passThrough&&"Promise"in window&&(p(),h(k)))))}return k.reset=function(){var n=k.direction;k.passThrough=!1,k.currentTime=0,k.progress=0,k.paused=!0,k.began=!1,k.loopBegan=!1,k.changeBegan=!1,k.completed=!1,k.changeCompleted=!1,k.reversePlayback=!1,k.reversed="reverse"===n,k.remaining=k.loop,c=k.children;for(var e=d=c.length;e--;)k.children[e].reset();(k.reversed&&!0!==k.loop||"alternate"===n&&1===k.loop)&&k.remaining++,y(k.reversed?k.duration:0)},k._onDocumentVisibility=o,k.set=function(n,e){return nn(n,e),k},k.tick=function(n){u(((l=n)+(f-(s=s||l)))*L.speed)},k.seek=function(n){u(m(n))},k.pause=function(){k.paused=!0,o()},k.play=function(){k.paused&&(k.completed&&k.reset(),k.paused=!1,S.push(k),o(),an())},k.reverse=function(){g(),k.completed=!k.reversed,o()},k.restart=function(){k.reset(),k.play()},k.remove=function(n){cn(A(n),k)},k.reset(),k.autoplay&&k.play(),k}function un(n,e){for(var t=e.length;t--;)h(n,e[t].animatable.target)&&e.splice(t,1)}function cn(n,e){var t=e.animations,r=e.children;un(n,t);for(var a=r.length;a--;){var o=r[a],u=o.animations;un(n,u),u.length||o.children.length||r.splice(a,1)}t.length||r.length||e.pause()}return L.version="3.2.1",L.speed=1,L.suspendWhenDocumentHidden=!0,L.running=S,L.remove=function(n){for(var e=A(n),t=S.length;t--;)cn(e,S[t])},L.get=T,L.set=nn,L.convertPx=y,L.path=function(n,e){var t=w.str(n)?a(n)[0]:n,r=e||100;return function(n){return{property:n,el:t,svg:Q(t),totalLength:G(t)*(r/100)}}},L.setDashoffset=function(n){var e=G(n);return n.setAttribute("stroke-dasharray",e),e},L.stagger=function(n,e){var i=(e=void 0===e?{}:e).direction||"normal",c=e.easing?P(e.easing):null,s=e.grid,f=e.axis,l=e.from||0,d="first"===l,p="center"===l,h="last"===l,g=w.arr(n),m=g?parseFloat(n[0]):parseFloat(n),v=g?parseFloat(n[1]):0,y=B(g?n[1]:n)||0,b=e.start||0+(g?m:0),M=[],x=0;return function(n,e,t){if(d&&(l=0),p&&(l=(t-1)/2),h&&(l=t-1),!M.length){for(var r,a,o,u=0;u<t;u++)s?(r=p?(s[0]-1)/2:l%s[0],a=p?(s[1]-1)/2:Math.floor(l/s[0]),r=r-u%s[0],a=a-Math.floor(u/s[0]),o=Math.sqrt(r*r+a*a),"x"===f&&(o=-r),M.push(o="y"===f?-a:o)):M.push(Math.abs(l-u)),x=Math.max.apply(Math,M);c&&(M=M.map(function(n){return c(n/x)*x})),"reverse"===i&&(M=M.map(function(n){return f?n<0?-1*n:-n:Math.abs(x-n)}))}return b+(g?(v-m)/x:m)*(Math.round(100*M[e])/100)+y}},L.timeline=function(u){var i=L(u=void 0===u?{}:u);return i.duration=0,i.add=function(n,e){var t=S.indexOf(i),r=i.children;function a(n){n.passThrough=!0}-1<t&&S.splice(t,1);for(var o=0;o<r.length;o++)a(r[o]);t=D(n,x(M,u)),t.targets=t.targets||u.targets,n=i.duration,t.autoplay=!1,t.direction=i.direction,t.timelineOffset=w.und(e)?n:E(e,n),a(i),i.seek(t.timelineOffset),e=L(t),a(e),r.push(e),n=tn(r,u);return i.delay=n.delay,i.endDelay=n.endDelay,i.duration=n.duration,i.seek(0),i.reset(),i.autoplay&&i.play(),i},i},L.easing=P,L.penner=s,L.random=function(n,e){return Math.floor(Math.random()*(e-n+1))+n},L});
+</script>
+<script>
+// ====== 初始数据（来自表格）======
+const SEED = [{"stage": "01 房屋交付前", "items": [{"cat": "验房", "space": "全屋", "name": "监理验房", "brand": "小区团购", "budget": 66, "paid": 66, "unpaid": 0, "date": "2026-04-22", "status": "已完成", "note": "找了监理免费验房，给的辛苦费"}, {"cat": "设计", "space": "全屋", "name": "平面图+各阶段跟单", "brand": "sjl工作室", "budget": 2500, "paid": 2500, "unpaid": 0, "date": "2026-04-25", "status": "已完成", "note": "sjl设计工作室，跟单就非常划算了，而且新小区非常容易推荐设计师"}, {"cat": "物业费用", "space": "全屋", "name": "一年物业费及燃气费", "brand": "物业", "budget": 4917.6, "paid": 4917.6, "unpaid": 0, "date": "2026-05-05", "status": "已完成", "note": "这里不止，扣除了房屋面积返现"}, {"cat": "物业费用", "space": "全屋", "name": "维修基金", "brand": "物业", "budget": 4340.4, "paid": 4340.4, "unpaid": 0, "date": "2026-05-05", "status": "已完成", "note": "已付清"}]}, {"stage": "02 开工准备与拆改", "items": [{"cat": "工长服务", "space": "全屋", "name": "工长服务款", "brand": "当家", "budget": 12870, "paid": 12870, "unpaid": 0, "date": "2026-05-23", "status": "已完成", "note": "已付清"}, {"cat": "门窗", "space": "阳台", "name": "封窗", "brand": "轩昂", "budget": 15000, "paid": 6000, "unpaid": 9000, "date": "2026-05-26", "status": "未完成", "note": "已付 ¥6,000；待付 ¥9,000"}, {"cat": "拆改", "space": "全屋", "name": "砸墙、防水及保温层铲除、垃圾清运", "brand": "小区团购", "budget": 3100, "paid": 3100, "unpaid": 0, "date": "2026-06-04", "status": "已完成", "note": "已付清"}, {"cat": "砌筑", "space": "全屋", "name": "砌墙人工", "brand": "当家", "budget": 2640, "paid": 2640, "unpaid": 0, "date": "2026-06-10", "status": "已完成", "note": "已付清"}, {"cat": "砌筑", "space": "全屋", "name": "砌墙材料", "brand": "当家", "budget": 2013, "paid": 2013, "unpaid": 0, "date": "2026-06-11", "status": "已完成", "note": "已付清"}, {"cat": "隔音", "space": "全屋", "name": "隔音阻尼材料", "brand": "拼多多", "budget": 230, "paid": 230, "unpaid": 0, "date": "2026-06-24", "status": "已完成", "note": "已付清"}]}, {"stage": "03 水电与隐蔽工程", "items": [{"cat": "水电", "space": "全屋", "name": "水电人工", "brand": "当家", "budget": 7740, "paid": 7740, "unpaid": 0, "date": "2026-06-20", "status": "已完成", "note": "已付清"}, {"cat": "水电", "space": "全屋", "name": "水电材料", "brand": "当家", "budget": 8387, "paid": 8387, "unpaid": 0, "date": "2026-06-20", "status": "已完成", "note": "¥7,275 + ¥1,045 + ¥67 = ¥8,387，已付清"}, {"cat": "开孔", "space": "全屋", "name": "打孔", "brand": "小区团购15一个", "budget": 435, "paid": 435, "unpaid": 0, "date": "2026-06-24", "status": "已完成", "note": "已付清"}]}, {"stage": "04 防水与瓦工瓷砖", "items": [{"cat": "瓷砖", "space": "全屋", "name": "瓷砖定金", "brand": "", "budget": 1000, "paid": 1000, "unpaid": 0, "date": "2026-07-02", "status": "已完成", "note": "本次付款已付清"}, {"cat": "铺贴", "space": "全屋", "name": "瓦工人工", "brand": "当家", "budget": 15117, "paid": 15117, "unpaid": 0, "date": "2026-07-03", "status": "已完成", "note": "已付清"}, {"cat": "瓷砖", "space": "全屋", "name": "瓷砖尾款", "brand": "", "budget": 15000, "paid": 12150, "unpaid": 0, "date": "2026-07-08", "status": "已完成", "note": "已付 ¥6,480 + ¥5,670 = ¥12,150"}, {"cat": "铺贴", "space": "全屋", "name": "瓦工材料", "brand": "", "budget": 1875, "paid": 1875, "unpaid": 0, "date": "2026-07-03", "status": "已完成", "note": "已付清"}, {"cat": "瓦工", "space": "厨卫", "name": "包立管（包管子）", "brand": "", "budget": 560, "paid": 560, "unpaid": 0, "date": "2026-07-05", "status": "已完成", "note": "包管子"}]}, {"stage": "05 木工与吊顶", "items": [{"cat": "吊顶", "space": "客餐厅", "name": "客餐厅吊顶", "brand": "", "budget": 3000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "人工", "space": "全屋", "name": "木工人工", "brand": "私人找的", "budget": 20000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "材料", "space": "全屋", "name": "木工辅料", "brand": "当家", "budget": 2000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "木作", "space": "全屋", "name": "其他木作基层", "brand": "", "budget": 10000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}]}, {"stage": "06 墙面与油漆", "items": [{"cat": "基层", "space": "全屋", "name": "墙面基层处理", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "人工", "space": "全屋", "name": "油工人工", "brand": "当家", "budget": 8000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "材料", "space": "全屋", "name": "油工辅料", "brand": "当家", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "材料", "space": "全屋", "name": "油漆", "brand": "", "budget": 8000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}]}, {"stage": "07 主材与安装", "items": [{"cat": "门", "space": "全屋", "name": "室内门及门套", "brand": "", "budget": 8000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "地面", "space": "全屋", "name": "踢脚线", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "水槽", "space": "厨房", "name": "厨房水槽", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "洗碗槽预算"}, {"cat": "马桶", "space": "卫生间", "name": "普通马桶*2", "brand": "", "budget": 2000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "卫浴", "space": "卫生间", "name": "台盆", "brand": "", "budget": 2000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "卫浴", "space": "卫生间", "name": "镜柜/浴室镜", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "卫浴", "space": "卫生间", "name": "淋浴花洒", "brand": "", "budget": 1200, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "卫浴预算"}, {"cat": "晾晒", "space": "阳台", "name": "电动晾衣架", "brand": "", "budget": 600, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "灯具", "space": "全屋", "name": "主灯/吸顶灯", "brand": "", "budget": 3000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "全屋灯具预算"}, {"cat": "灯具", "space": "全屋", "name": "筒灯/射灯", "brand": "", "budget": 300, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "灯具", "space": "全屋", "name": "灯带/线性灯", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "电气", "space": "全屋", "name": "开关插座面板", "brand": "", "budget": 300, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}]}, {"stage": "09 家具与软装", "items": [{"cat": "沙发", "space": "客厅", "name": "沙发", "brand": "", "budget": 5000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "茶几", "space": "客厅", "name": "茶几", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "电视柜", "space": "客厅", "name": "成品电视柜", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "餐桌椅", "space": "餐厅", "name": "餐桌/岛台", "brand": "", "budget": 3000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "餐椅", "space": "餐厅", "name": "备用餐椅/吧椅", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "床", "space": "主卧", "name": "主卧床", "brand": "", "budget": 1500, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "组合预算：主卧床 + 床垫"}, {"cat": "床垫", "space": "主卧", "name": "主卧床垫", "brand": "", "budget": 2500, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "床头柜", "space": "主卧", "name": "床头柜*4（主次卧）", "brand": "", "budget": 2000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "床", "space": "次卧", "name": "次卧床", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "组合预算：次卧床 + 床垫"}, {"cat": "床垫", "space": "次卧", "name": "次卧床垫", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "书桌", "space": "电竞房", "name": "书桌", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "座椅", "space": "电竞房", "name": "人体工学椅", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "梳妆台", "space": "主卧", "name": "梳妆台与凳", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "窗帘", "space": "全屋", "name": "布帘", "brand": "", "budget": 5000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "全屋窗帘预算"}, {"cat": "装饰灯", "space": "客厅/卧室", "name": "落地灯/台灯", "brand": "", "budget": 1000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}]}, {"stage": "10 家电与智能家居", "items": [{"cat": "空调", "space": "全屋", "name": "中央空调/风管机", "brand": "", "budget": 6000, "paid": 6034, "unpaid": 0, "date": "2026-07-08", "status": "已完成", "note": "小彤付 · 风管机主机"}, {"cat": "空调", "space": "全屋", "name": "风管机铜管", "brand": "", "budget": 150, "paid": 150, "unpaid": 0, "date": "2026-07-08", "status": "已完成", "note": "铜管费用"}, {"cat": "空调", "space": "卧室/客厅", "name": "分体空调", "brand": "", "budget": 6000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "冰箱", "space": "厨房", "name": "冰箱", "brand": "", "budget": 3000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": "组合预算：洗衣机 + 冰箱"}, {"cat": "洗衣", "space": "阳台", "name": "洗衣机", "brand": "", "budget": 2000, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "洗衣", "space": "阳台", "name": "烘干机", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "洗碗", "space": "厨房", "name": "洗碗机", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "厨电", "space": "厨房", "name": "油烟机", "brand": "", "budget": 1600, "paid": 1600, "unpaid": 0, "date": "", "status": "已完成", "note": "小彤付"}, {"cat": "厨电", "space": "厨房", "name": "燃气灶/电磁灶", "brand": "", "budget": 900, "paid": 900, "unpaid": 0, "date": "", "status": "已完成", "note": "小彤付"}, {"cat": "厨电", "space": "厨房", "name": "蒸箱/烤箱", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "厨电", "space": "厨房", "name": "微波炉", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "热水", "space": "厨卫", "name": "燃气/电热水器", "brand": "", "budget": 1500, "paid": 1500, "unpaid": 0, "date": "", "status": "已完成", "note": "小彤付"}, {"cat": "影音", "space": "客厅/卧室", "name": "电视", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "影音", "space": "客厅", "name": "投影仪", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "影音", "space": "客厅", "name": "幕布", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "清洁", "space": "全屋", "name": "扫地机器人", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "清洁", "space": "全屋", "name": "吸尘器/洗地机", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "智能", "space": "玄关", "name": "智能门锁", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "智能", "space": "全屋", "name": "智能网关", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}]}, {"stage": "11 保洁验收与入住", "items": [{"cat": "保洁", "space": "全屋", "name": "开荒保洁", "brand": "", "budget": 0, "paid": 0, "unpaid": 0, "date": "", "status": "未完成", "note": ""}, {"cat": "清运", "space": "全屋", "name": "垃圾清运费", "brand": "", "budget": 479, "paid": 479, "unpaid": 0, "date": "2026-07-06", "status": "已完成", "note": "80 袋"}]}, {"stage": "12 结算与备用金", "items": []}, {"stage": "回款 · 回收返款", "noStat": true, "items": [{"cat": "回款", "space": "全屋", "name": "空气能", "brand": "", "budget": 1200, "paid": 1200, "unpaid": 0, "date": "", "status": "已完成", "note": "回收返款"}, {"cat": "回款", "space": "全屋", "name": "移门*2", "brand": "", "budget": 1000, "paid": 1000, "unpaid": 0, "date": "", "status": "已完成", "note": "回收返款"}, {"cat": "回款", "space": "全屋", "name": "电线", "brand": "", "budget": 330, "paid": 330, "unpaid": 0, "date": "", "status": "已完成", "note": "回收返款"}]}];
+const LS_KEY = "yxsl_budget_v7";
+
+function loadData(){
+  try{const s=localStorage.getItem(LS_KEY); if(s) return JSON.parse(s);}catch(e){}
+  return JSON.parse(JSON.stringify(SEED));
+}
+function saveData(){localStorage.setItem(LS_KEY, JSON.stringify(DATA));}
+let DATA = loadData();
+let filter="all", keyword="";
+
+const fmt = n => (Number(n)||0).toLocaleString('zh-CN',{maximumFractionDigits:2});
+const toast = msg => {const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);};
+
+// ====== KPI 计算 ======
+function calcKPI(){
+  let budget=0,paid=0,unpaid=0,done=0,todo=0;
+  DATA.forEach(s=>{ if(s.noStat) return; s.items.forEach(it=>{
+    budget+=Number(it.budget)||0; paid+=Number(it.paid)||0; unpaid+=Number(it.unpaid)||0;
+    if(it.status==='已完成')done++; else if(it.status==='未完成')todo++;
+  });});
+  return {budget,paid,unpaid,remain:budget-paid,done,todo};
+}
+// ====== 数字增量动画 ======
+function animateNumber(el, to, money){
+  const from = el._cur || 0;
+  if(from===to){el.textContent = money?fmt(to):to; el._cur=to; return;}
+  const dur = 700, t0 = performance.now();
+  const ease = t => 1-Math.pow(1-t,3);
+  function step(now){
+    const p = Math.min((now-t0)/dur, 1);
+    const val = from + (to-from)*ease(p);
+    el.textContent = money ? fmt(Math.round(val)) : Math.round(val);
+    if(p<1) requestAnimationFrame(step);
+    else { el.textContent = money?fmt(to):to; el._cur = to; }
+  }
+  el._cur = from;
+  requestAnimationFrame(step);
+}
+
+const KPI_DEFS=[
+  {key:'budget',l:'总预算',c:'#C79A52',money:1},
+  {key:'paid',l:'已付款',c:'#376B55',money:1},
+  {key:'unpaid',l:'未付尾款',c:'#C95252',money:1},
+  {key:'remain',l:'预计剩余未付',c:'#214E3B',money:1},
+  {key:'done',l:'已完成节点',c:'#376B55',money:0},
+  {key:'todo',l:'未完成节点',c:'#C79A52',money:0},
+];
+let kpiBuilt=false;
+function buildKPI(){
+  document.getElementById('kpis').innerHTML = KPI_DEFS.map(c=>`
+    <div class="kpi" style="--accent:${c.c}">
+      <div class="label"><span class="dot" style="background:${c.c}"></span>${c.l}</div>
+      <div class="value ${c.money?'money':''}" data-key="${c.key}">0</div>
+    </div>`).join('');
+  kpiBuilt=true;
+}
+function renderKPI(){
+  const k=calcKPI();
+  if(!kpiBuilt) buildKPI();
+  KPI_DEFS.forEach(c=>{
+    const el=document.querySelector(`.value[data-key="${c.key}"]`);
+    animateNumber(el, Math.round(k[c.key]), c.money);
+  });
+  const pct = k.done+k.todo ? Math.round(k.done/(k.done+k.todo)*100) : 0;
+  setTimeout(()=>{document.getElementById('progFill').style.width=pct+'%';},200);
+  document.getElementById('progLabel').textContent=`节点完成进度 ${k.done}/${k.done+k.todo} · ${pct}%`;
+  const nc=document.getElementById('nodeCount'); if(nc)nc.textContent=k.done+k.todo;
+  drawCharts();
+}
+
+// ====== 表格渲染 ======
+const COLS=[
+  {k:'cat',t:'类别'},{k:'space',t:'空间'},{k:'name',t:'项目名称'},{k:'brand',t:'品牌/规格'},
+  {k:'budget',t:'预算款',cls:'money budget'},{k:'paid',t:'已付款',cls:'money paid'},
+  {k:'unpaid',t:'未付尾款',cls:'money unpaid'},{k:'date',t:'日期'},
+  {k:'status',t:'状态'},{k:'note',t:'备注'}
+];
+// 回款节点专属列：不显示预算/未付/状态，只展示回收款
+const REBATE_COLS=[
+  {k:'name',t:'回款项目'},{k:'space',t:'空间'},
+  {k:'paid',t:'回收金额',cls:'money rebate'},{k:'date',t:'日期'},{k:'note',t:'备注'}
+];
+function match(it){
+  if(filter==='done'&&it.status!=='已完成')return false;
+  if(filter==='todo'&&it.status!=='未完成')return false;
+  if(keyword){
+    const hay=(it.cat+it.space+it.name+it.brand+it.note).toLowerCase();
+    if(!hay.includes(keyword.toLowerCase()))return false;
+  }
+  return true;
+}
+function stageSum(s){
+  let b=0,p=0,u=0;
+  s.items.forEach(it=>{b+=Number(it.budget)||0;p+=Number(it.paid)||0;u+=Number(it.unpaid)||0;});
+  return {b,p,u};
+}
+function renderStages(){
+  const box=document.getElementById('stages'); box.innerHTML='';
+  DATA.forEach((s,si)=>{
+    const visible=s.items.filter(match);
+    if(!visible.length && (keyword||filter!=='all')) return;
+    const isRebate=!!s.noStat;
+    const cols=isRebate?REBATE_COLS:COLS;
+    const sum=stageSum(s);
+    const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':''); el.dataset.si=si;
+    let rows = s.items.map((it,ii)=>{
+      if(!match(it)) return '';
+      const tds=cols.map(col=>{
+        if(col.k==='status'){
+          const done=it.status==='已完成';
+          return `<td class="tdstatus" style="text-align:center"><span class="status-badge ${done?'done':'todo'}" data-si="${si}" data-ii="${ii}">${it.status||'未完成'}</span></td>`;
+        }
+        const isMoney=col.cls&&col.cls.includes('money');
+        const val=isMoney?fmt(it[col.k]):(it[col.k]||'');
+        return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></td>`;
+      }).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+    const sumHtml = isRebate
+      ? `<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`
+      : `<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
+    el.innerHTML=`
+      <div class="stage-head">
+        <h2><span class="caret">▾</span>${isRebate?'♻ ':''}${s.stage}</h2>
+        <div class="stage-sum">${sumHtml}</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>${cols.map(c=>{
+            const cm=c.cls&&c.cls.includes('money');
+            const cc=(c.k==='status')?'thcenter':'';
+            return `<th class="${cm?'thmoney':cc}">${c.t}</th>`;
+          }).join('')}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+    box.appendChild(el);
+  });
+  bindEditing();
+  observeStages();
+}
+
+// ====== 编辑与保存 ======
+function bindEditing(){
+  document.querySelectorAll('.cell').forEach(cell=>{
+    cell.addEventListener('blur',function(){
+      const {si,ii,k}=this.dataset; const money=this.dataset.money==='1';
+      let v=this.textContent.trim();
+      if(money){v=v.replace(/[,¥\s]/g,''); v=v===''?0:(parseFloat(v)||0); this.textContent=fmt(v);}
+      DATA[si].items[ii][k]=v;
+      saveData(); renderKPI();
+      this.classList.add('saved'); setTimeout(()=>this.classList.remove('saved'),700);
+      toast('已保存 ✓');
+      // 更新该阶段汇总
+      refreshStageSum(si);
+    });
+    cell.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.blur();}
+    });
+  });
+  document.querySelectorAll('.status-badge').forEach(b=>{
+    b.addEventListener('click',function(){
+      const {si,ii}=this.dataset;
+      const cur=DATA[si].items[ii].status;
+      const nv=cur==='已完成'?'未完成':'已完成';
+      DATA[si].items[ii].status=nv;
+      saveData();
+      this.textContent=nv;
+      this.className='status-badge '+(nv==='已完成'?'done':'todo');
+      if(window.anime){anime({targets:this,scale:[{value:1.25,duration:140},{value:1,duration:260}],easing:'easeOutBack'});}
+      renderKPI(); toast('状态已更新 → '+nv);
+    });
+  });
+}
+function refreshStageSum(si){
+  const s=DATA[si],sum=stageSum(s);
+  const el=document.querySelector(`.stage[data-si="${si}"] .stage-sum`);
+  if(el)el.innerHTML=`<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
+}
+
+// ====== 折叠 / 滚动动画 ======
+function observeStages(){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      // anime.js 交错进场：阶段头 + 行依次浮现
+      if(window.anime && !e.target._animated){
+        e.target._animated=true;
+        const rows=e.target.querySelectorAll('tbody tr');
+        anime({targets:e.target.querySelector('.stage-head'),translateY:[16,0],opacity:[0,1],duration:500,easing:'easeOutCubic'});
+        anime({targets:rows,translateX:[-14,0],opacity:[0,1],delay:anime.stagger(28,{start:120}),duration:420,easing:'easeOutCubic'});
+      }
+      io.unobserve(e.target);
+    }
+  }),{threshold:.06});
+  document.querySelectorAll('.stage').forEach(s=>io.observe(s));
+  document.querySelectorAll('.stage-head').forEach(h=>{
+    h.addEventListener('click',e=>{ if(e.target.closest('.cell'))return; h.parentElement.classList.toggle('collapsed');});
+  });
+}
+
+// ====== 工具条事件 ======
+document.getElementById('search').addEventListener('input',e=>{keyword=e.target.value;renderStages();});
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',function(){
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+  this.classList.add('active'); filter=this.dataset.f; renderStages();
+}));
+document.getElementById('expandAll').addEventListener('click',()=>{
+  const stages=document.querySelectorAll('.stage');
+  const anyOpen=[...stages].some(s=>!s.classList.contains('collapsed'));
+  stages.forEach(s=>s.classList.toggle('collapsed',anyOpen));
+});
+document.getElementById('reset').addEventListener('click',()=>{
+  if(confirm('确定恢复到初始数据？你的所有本地修改将被清除。')){
+    localStorage.removeItem(LS_KEY); DATA=JSON.parse(JSON.stringify(SEED));
+    renderKPI(); renderStages(); toast('已恢复初始数据');
+  }
+});
+// 导出数据为 JSON 文件
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=new Date().toISOString().slice(0,10);
+  a.href=url; a.download='雍贤山庐预算数据-'+d+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('已导出当前数据 ✓');
+});
+// 导入 JSON 文件
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',function(){
+  const f=this.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{
+    try{
+      const arr=JSON.parse(e.target.result);
+      if(!Array.isArray(arr)||!arr[0]||!('items' in arr[0])) throw new Error('格式不符');
+      if(confirm('确定用导入的数据覆盖当前内容？建议先导出备份。')){
+        DATA=arr; saveData(); renderKPI(); renderStages(); toast('导入成功 ✓');
+      }
+    }catch(err){ alert('导入失败：文件不是有效的预算数据 JSON。\n'+err.message); }
+    this.value='';
+  };
+  rd.readAsText(f);
+});
+// back to top / 回到流程开始
+const topBtn=document.getElementById('top');
+const startBtn=document.getElementById('toStart');
+window.addEventListener('scroll',()=>{
+  const show=window.scrollY>400;
+  topBtn.classList.toggle('show',show);
+  startBtn.classList.toggle('show',show);
+});
+topBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+startBtn.addEventListener('click',()=>{
+  const first=document.querySelector('#stages .stage');
+  if(first){
+    const y=first.getBoundingClientRect().top+window.scrollY-12;
+    window.scrollTo({top:y,behavior:'smooth'});
+    if(window.anime){anime({targets:first,scale:[1.02,1],duration:600,easing:'easeOutElastic(1,.6)'});}
+  }
+});
+
+// ====== 图表（纯 Canvas 自绘）======
+function setupCanvas(cv, cssH){
+  const dpr = window.devicePixelRatio||1;
+  const w = cv.clientWidth || cv.parentElement.clientWidth-40;
+  cv.width = w*dpr; cv.height = cssH*dpr;
+  cv.style.height = cssH+'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w,h:cssH};
+}
+let chartAnim=0;
+function drawCharts(){
+  cancelAnimationFrame(chartAnim);
+  const t0=performance.now(), dur=900, ease=t=>1-Math.pow(1-t,3);
+  function frame(now){
+    const p=Math.min((now-t0)/dur,1), e=ease(p);
+    drawBar(e); drawDonut(e);
+    if(p<1) chartAnim=requestAnimationFrame(frame);
+  }
+  chartAnim=requestAnimationFrame(frame);
+}
+function stageData(){
+  return DATA.filter(s=>s.items.length && !s.noStat).map(s=>{
+    let b=0,pd=0; s.items.forEach(it=>{b+=Number(it.budget)||0;pd+=Number(it.paid)||0;});
+    return {name:s.stage.replace(/^\d+\s*/,''), budget:b, paid:pd};
+  }).filter(d=>d.budget>0||d.paid>0);
+}
+function drawBar(prog){
+  const cv=document.getElementById('barChart'); if(!cv)return;
+  const rows=stageData();
+  const H=Math.max(300, rows.length*40+30);
+  const {ctx,w}=setupCanvas(cv,H);
+  ctx.clearRect(0,0,w,H);
+  const padL=110, padR=72, padT=8, padB=10;
+  const max=Math.max(...rows.map(d=>Math.max(d.budget,d.paid)),1);
+  const chartW=w-padL-padR, rowH=(H-padT-padB)/rows.length, bh=Math.min(11,rowH/3);
+  ctx.font='11px "PingFang SC","Microsoft YaHei",sans-serif';
+  rows.forEach((d,i)=>{
+    const cy=padT+i*rowH+rowH/2;
+    // label
+    ctx.fillStyle='#24312B'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText(d.name.length>7?d.name.slice(0,7):d.name, padL-10, cy);
+    // budget bar
+    const bw=chartW*(d.budget/max)*prog;
+    roundRect(ctx,padL,cy-bh-1,bw,bh,3); ctx.fillStyle='#C79A52'; ctx.fill();
+    // paid bar
+    const pw=chartW*(d.paid/max)*prog;
+    roundRect(ctx,padL,cy+1,pw,bh,3); ctx.fillStyle='#376B55'; ctx.fill();
+    // value labels (both bars)
+    if(prog>0.9){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font='10px sans-serif';
+      ctx.fillStyle='#B07D2E'; ctx.fillText('¥'+fmt(d.budget), padL+bw+5, cy-bh/2-1);
+      ctx.fillStyle='#2C5A46'; ctx.fillText('¥'+fmt(d.paid), padL+pw+5, cy+bh/2+2);
+    }
+    ctx.font='11px "PingFang SC",sans-serif';
+  });
+}
+function drawDonut(prog){
+  const cv=document.getElementById('donutChart'); if(!cv)return;
+  const {ctx,w,h}=setupCanvas(cv,300);
+  ctx.clearRect(0,0,w,h);
+  const k=calcKPI();
+  const parts=[
+    {l:'已付款',v:k.paid,c:'#376B55'},
+    {l:'预计剩余未付',v:Math.max(k.remain,0),c:'#C79A52'},
+  ];
+  const total=parts.reduce((s,p)=>s+p.v,0)||1;
+  const cx=w/2, cy=h/2-6, R=Math.min(w,h)/2-40, r=R*0.58;
+  let start=-Math.PI/2;
+  parts.forEach(pt=>{
+    const ang=(pt.v/total)*Math.PI*2*prog;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,start,start+ang); ctx.closePath();
+    ctx.fillStyle=pt.c; ctx.fill();
+    start+=ang;
+  });
+  // inner hole
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  // center text
+  ctx.fillStyle='#214E3B'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='700 20px "PingFang SC",sans-serif';
+  const donePct=Math.round(k.paid/(k.budget||1)*100*prog);
+  ctx.fillText(donePct+'%', cx, cy-6);
+  ctx.fillStyle='#6D7771'; ctx.font='11px "PingFang SC",sans-serif';
+  ctx.fillText('已付占预算', cx, cy+14);
+  // legend
+  if(prog>0.95){
+    const lg=document.getElementById('donutLegend');
+    lg.innerHTML=parts.map(p=>`<span><i style="background:${p.c}"></i>${p.l} ¥${fmt(p.v)}</span>`).join('');
+  }
+}
+function roundRect(ctx,x,y,w,h,r){
+  if(w<0){x+=w;w=-w;} r=Math.min(r,h/2,w/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+window.addEventListener('resize',()=>{drawBar(1);drawDonut(1);});
+// 图表卡片进场
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.1})
+  .observe(document.querySelector('.charts .chart-card'));
+document.querySelectorAll('.chart-card').forEach((c,i)=>{c.style.animationDelay=(i*.12)+'s';c.classList.add('in');});
+
+// ====== 初始化 ======
+renderKPI(); renderStages();
+// anime.js: KPI 卡片弹入进场
+if(window.anime){
+  anime({targets:'.kpi',translateY:[28,0],opacity:[0,1],scale:[.94,1],delay:anime.stagger(80,{start:120}),duration:640,easing:'easeOutBack'});
+  anime({targets:'header h1',translateY:[-20,0],opacity:[0,1],duration:700,easing:'easeOutCubic'});
+}
+</script>
+</body>
+</html>

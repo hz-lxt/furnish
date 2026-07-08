@@ -1,0 +1,986 @@
+[
+  {
+    "stage": "01 房屋交付前",
+    "items": [
+      {
+        "cat": "验房",
+        "space": "全屋",
+        "name": "监理验房",
+        "brand": "小区团购",
+        "budget": 66,
+        "paid": 66,
+        "unpaid": 0,
+        "date": "2026-04-22",
+        "status": "已完成",
+        "note": "找了监理免费验房，给的辛苦费"
+      },
+      {
+        "cat": "设计",
+        "space": "全屋",
+        "name": "平面图+各阶段跟单",
+        "brand": "sjl工作室",
+        "budget": 2500,
+        "paid": 2500,
+        "unpaid": 0,
+        "date": "2026-04-25",
+        "status": "已完成",
+        "note": "sjl设计工作室，跟单就非常划算了，而且新小区非常容易推荐设计师"
+      },
+      {
+        "cat": "物业费用",
+        "space": "全屋",
+        "name": "一年物业费及燃气费",
+        "brand": "物业",
+        "budget": 4917.6,
+        "paid": 4917.6,
+        "unpaid": 0,
+        "date": "2026-05-05",
+        "status": "已完成",
+        "note": "这里不止，扣除了房屋面积返现"
+      },
+      {
+        "cat": "物业费用",
+        "space": "全屋",
+        "name": "维修基金",
+        "brand": "物业",
+        "budget": 4340.4,
+        "paid": 4340.4,
+        "unpaid": 0,
+        "date": "2026-05-05",
+        "status": "已完成",
+        "note": "已付清"
+      }
+    ]
+  },
+  {
+    "stage": "02 开工准备与拆改",
+    "items": [
+      {
+        "cat": "工长服务",
+        "space": "全屋",
+        "name": "工长服务款",
+        "brand": "当家",
+        "budget": 12870,
+        "paid": 12870,
+        "unpaid": 0,
+        "date": "2026-05-23",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "门窗",
+        "space": "阳台",
+        "name": "封窗",
+        "brand": "轩昂",
+        "budget": 15000,
+        "paid": 6000,
+        "unpaid": 9000,
+        "date": "2026-05-26",
+        "status": "未完成",
+        "note": "已付 ¥6,000；待付 ¥9,000"
+      },
+      {
+        "cat": "拆改",
+        "space": "全屋",
+        "name": "砸墙、防水及保温层铲除、垃圾清运",
+        "brand": "小区团购",
+        "budget": 3100,
+        "paid": 3100,
+        "unpaid": 0,
+        "date": "2026-06-04",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "砌筑",
+        "space": "全屋",
+        "name": "砌墙人工",
+        "brand": "当家",
+        "budget": 2640,
+        "paid": 2640,
+        "unpaid": 0,
+        "date": "2026-06-10",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "砌筑",
+        "space": "全屋",
+        "name": "砌墙材料",
+        "brand": "当家",
+        "budget": 2013,
+        "paid": 2013,
+        "unpaid": 0,
+        "date": "2026-06-11",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "隔音",
+        "space": "全屋",
+        "name": "隔音阻尼材料",
+        "brand": "拼多多",
+        "budget": 230,
+        "paid": 230,
+        "unpaid": 0,
+        "date": "2026-06-24",
+        "status": "已完成",
+        "note": "已付清"
+      }
+    ]
+  },
+  {
+    "stage": "03 水电与隐蔽工程",
+    "items": [
+      {
+        "cat": "水电",
+        "space": "全屋",
+        "name": "水电人工",
+        "brand": "当家",
+        "budget": 7740,
+        "paid": 7740,
+        "unpaid": 0,
+        "date": "2026-06-20",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "水电",
+        "space": "全屋",
+        "name": "水电材料",
+        "brand": "当家",
+        "budget": 8387,
+        "paid": 8387,
+        "unpaid": 0,
+        "date": "2026-06-20",
+        "status": "已完成",
+        "note": "¥7,275 + ¥1,045 + ¥67 = ¥8,387，已付清"
+      },
+      {
+        "cat": "开孔",
+        "space": "全屋",
+        "name": "打孔",
+        "brand": "小区团购15一个",
+        "budget": 435,
+        "paid": 435,
+        "unpaid": 0,
+        "date": "2026-06-24",
+        "status": "已完成",
+        "note": "已付清"
+      }
+    ]
+  },
+  {
+    "stage": "04 防水与瓦工瓷砖",
+    "items": [
+      {
+        "cat": "瓷砖",
+        "space": "全屋",
+        "name": "瓷砖定金",
+        "brand": "",
+        "budget": 1000,
+        "paid": 1000,
+        "unpaid": 0,
+        "date": "2026-07-02",
+        "status": "已完成",
+        "note": "本次付款已付清"
+      },
+      {
+        "cat": "铺贴",
+        "space": "全屋",
+        "name": "瓦工人工",
+        "brand": "当家",
+        "budget": 15117,
+        "paid": 15117,
+        "unpaid": 0,
+        "date": "2026-07-03",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "瓷砖",
+        "space": "全屋",
+        "name": "瓷砖尾款",
+        "brand": "",
+        "budget": 15000,
+        "paid": 12150,
+        "unpaid": 0,
+        "date": "2026-07-08",
+        "status": "已完成",
+        "note": "已付 ¥6,480 + ¥5,670 = ¥12,150"
+      },
+      {
+        "cat": "铺贴",
+        "space": "全屋",
+        "name": "瓦工材料",
+        "brand": "",
+        "budget": 1875,
+        "paid": 1875,
+        "unpaid": 0,
+        "date": "2026-07-03",
+        "status": "已完成",
+        "note": "已付清"
+      },
+      {
+        "cat": "瓦工",
+        "space": "厨卫",
+        "name": "包立管（包管子）",
+        "brand": "",
+        "budget": 560,
+        "paid": 560,
+        "unpaid": 0,
+        "date": "2026-07-05",
+        "status": "已完成",
+        "note": "包管子"
+      }
+    ]
+  },
+  {
+    "stage": "05 木工与吊顶",
+    "items": [
+      {
+        "cat": "吊顶",
+        "space": "客餐厅",
+        "name": "客餐厅吊顶",
+        "brand": "",
+        "budget": 3000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "人工",
+        "space": "全屋",
+        "name": "木工人工",
+        "brand": "私人找的",
+        "budget": 20000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "材料",
+        "space": "全屋",
+        "name": "木工辅料",
+        "brand": "当家",
+        "budget": 2000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "木作",
+        "space": "全屋",
+        "name": "其他木作基层",
+        "brand": "",
+        "budget": 10000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "stage": "06 墙面与油漆",
+    "items": [
+      {
+        "cat": "基层",
+        "space": "全屋",
+        "name": "墙面基层处理",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "人工",
+        "space": "全屋",
+        "name": "油工人工",
+        "brand": "当家",
+        "budget": 8000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "材料",
+        "space": "全屋",
+        "name": "油工辅料",
+        "brand": "当家",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "材料",
+        "space": "全屋",
+        "name": "油漆",
+        "brand": "",
+        "budget": 8000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "stage": "07 主材与安装",
+    "items": [
+      {
+        "cat": "门",
+        "space": "全屋",
+        "name": "室内门及门套",
+        "brand": "",
+        "budget": 8000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "地面",
+        "space": "全屋",
+        "name": "踢脚线",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "水槽",
+        "space": "厨房",
+        "name": "厨房水槽",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "洗碗槽预算"
+      },
+      {
+        "cat": "马桶",
+        "space": "卫生间",
+        "name": "普通马桶*2",
+        "brand": "",
+        "budget": 2000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "卫浴",
+        "space": "卫生间",
+        "name": "台盆",
+        "brand": "",
+        "budget": 2000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "卫浴",
+        "space": "卫生间",
+        "name": "镜柜/浴室镜",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "卫浴",
+        "space": "卫生间",
+        "name": "淋浴花洒",
+        "brand": "",
+        "budget": 1200,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "卫浴预算"
+      },
+      {
+        "cat": "晾晒",
+        "space": "阳台",
+        "name": "电动晾衣架",
+        "brand": "",
+        "budget": 600,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "灯具",
+        "space": "全屋",
+        "name": "主灯/吸顶灯",
+        "brand": "",
+        "budget": 3000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "全屋灯具预算"
+      },
+      {
+        "cat": "灯具",
+        "space": "全屋",
+        "name": "筒灯/射灯",
+        "brand": "",
+        "budget": 300,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "灯具",
+        "space": "全屋",
+        "name": "灯带/线性灯",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "电气",
+        "space": "全屋",
+        "name": "开关插座面板",
+        "brand": "",
+        "budget": 300,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "stage": "09 家具与软装",
+    "items": [
+      {
+        "cat": "沙发",
+        "space": "客厅",
+        "name": "沙发",
+        "brand": "",
+        "budget": 5000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "茶几",
+        "space": "客厅",
+        "name": "茶几",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "电视柜",
+        "space": "客厅",
+        "name": "成品电视柜",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "餐桌椅",
+        "space": "餐厅",
+        "name": "餐桌/岛台",
+        "brand": "",
+        "budget": 3000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "餐椅",
+        "space": "餐厅",
+        "name": "备用餐椅/吧椅",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "床",
+        "space": "主卧",
+        "name": "主卧床",
+        "brand": "",
+        "budget": 1500,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "组合预算：主卧床 + 床垫"
+      },
+      {
+        "cat": "床垫",
+        "space": "主卧",
+        "name": "主卧床垫",
+        "brand": "",
+        "budget": 2500,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "床头柜",
+        "space": "主卧",
+        "name": "床头柜*4（主次卧）",
+        "brand": "",
+        "budget": 2000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "床",
+        "space": "次卧",
+        "name": "次卧床",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "组合预算：次卧床 + 床垫"
+      },
+      {
+        "cat": "床垫",
+        "space": "次卧",
+        "name": "次卧床垫",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "书桌",
+        "space": "电竞房",
+        "name": "书桌",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "座椅",
+        "space": "电竞房",
+        "name": "人体工学椅",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "梳妆台",
+        "space": "主卧",
+        "name": "梳妆台与凳",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "窗帘",
+        "space": "全屋",
+        "name": "布帘",
+        "brand": "",
+        "budget": 5000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "全屋窗帘预算"
+      },
+      {
+        "cat": "装饰灯",
+        "space": "客厅/卧室",
+        "name": "落地灯/台灯",
+        "brand": "",
+        "budget": 1000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "stage": "10 家电与智能家居",
+    "items": [
+      {
+        "cat": "空调",
+        "space": "全屋",
+        "name": "中央空调/风管机",
+        "brand": "",
+        "budget": 6000,
+        "paid": 6034,
+        "unpaid": 0,
+        "date": "2026-07-08",
+        "status": "已完成",
+        "note": "小彤付 · 风管机主机"
+      },
+      {
+        "cat": "空调",
+        "space": "全屋",
+        "name": "风管机铜管",
+        "brand": "",
+        "budget": 150,
+        "paid": 150,
+        "unpaid": 0,
+        "date": "2026-07-08",
+        "status": "已完成",
+        "note": "铜管费用"
+      },
+      {
+        "cat": "空调",
+        "space": "卧室/客厅",
+        "name": "分体空调",
+        "brand": "",
+        "budget": 6000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "冰箱",
+        "space": "厨房",
+        "name": "冰箱",
+        "brand": "",
+        "budget": 3000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": "组合预算：洗衣机 + 冰箱"
+      },
+      {
+        "cat": "洗衣",
+        "space": "阳台",
+        "name": "洗衣机",
+        "brand": "",
+        "budget": 2000,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "洗衣",
+        "space": "阳台",
+        "name": "烘干机",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "洗碗",
+        "space": "厨房",
+        "name": "洗碗机",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "厨电",
+        "space": "厨房",
+        "name": "油烟机",
+        "brand": "",
+        "budget": 1600,
+        "paid": 1600,
+        "unpaid": 0,
+        "date": "",
+        "status": "已完成",
+        "note": "小彤付"
+      },
+      {
+        "cat": "厨电",
+        "space": "厨房",
+        "name": "燃气灶/电磁灶",
+        "brand": "",
+        "budget": 900,
+        "paid": 900,
+        "unpaid": 0,
+        "date": "",
+        "status": "已完成",
+        "note": "小彤付"
+      },
+      {
+        "cat": "厨电",
+        "space": "厨房",
+        "name": "蒸箱/烤箱",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "厨电",
+        "space": "厨房",
+        "name": "微波炉",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "热水",
+        "space": "厨卫",
+        "name": "燃气/电热水器",
+        "brand": "",
+        "budget": 1500,
+        "paid": 1500,
+        "unpaid": 0,
+        "date": "",
+        "status": "已完成",
+        "note": "小彤付"
+      },
+      {
+        "cat": "影音",
+        "space": "客厅/卧室",
+        "name": "电视",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "影音",
+        "space": "客厅",
+        "name": "投影仪",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "影音",
+        "space": "客厅",
+        "name": "幕布",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "清洁",
+        "space": "全屋",
+        "name": "扫地机器人",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "清洁",
+        "space": "全屋",
+        "name": "吸尘器/洗地机",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "智能",
+        "space": "玄关",
+        "name": "智能门锁",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "智能",
+        "space": "全屋",
+        "name": "智能网关",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "stage": "11 保洁验收与入住",
+    "items": [
+      {
+        "cat": "保洁",
+        "space": "全屋",
+        "name": "开荒保洁",
+        "brand": "",
+        "budget": 0,
+        "paid": 0,
+        "unpaid": 0,
+        "date": "",
+        "status": "未完成",
+        "note": ""
+      },
+      {
+        "cat": "清运",
+        "space": "全屋",
+        "name": "垃圾清运费",
+        "brand": "",
+        "budget": 479,
+        "paid": 479,
+        "unpaid": 0,
+        "date": "2026-07-06",
+        "status": "已完成",
+        "note": "80 袋"
+      }
+    ]
+  },
+  {
+    "stage": "12 结算与备用金",
+    "items": []
+  },
+  {
+    "stage": "回款 · 回收返款",
+    "noStat": true,
+    "items": [
+      {
+        "cat": "回款",
+        "space": "全屋",
+        "name": "空气能",
+        "brand": "",
+        "budget": 1200,
+        "paid": 1200,
+        "unpaid": 0,
+        "date": "",
+        "status": "已完成",
+        "note": "回收返款"
+      },
+      {
+        "cat": "回款",
+        "space": "全屋",
+        "name": "移门*2",
+        "brand": "",
+        "budget": 1000,
+        "paid": 1000,
+        "unpaid": 0,
+        "date": "",
+        "status": "已完成",
+        "note": "回收返款"
+      },
+      {
+        "cat": "回款",
+        "space": "全屋",
+        "name": "电线",
+        "brand": "",
+        "budget": 330,
+        "paid": 330,
+        "unpaid": 0,
+        "date": "",
+        "status": "已完成",
+        "note": "回收返款"
+      }
+    ]
+  }
+]
