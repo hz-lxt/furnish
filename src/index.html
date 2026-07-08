@@ -351,7 +351,12 @@ function getEditPassword(){
 }
 function saveData(){
   localStorage.setItem(LS_KEY, JSON.stringify(DATA));
-  if(!applyingRemote) queueCloudSave();
+  if(applyingRemote) return;
+  if(!getEditPassword()){
+    toast("未输入编辑密码，仅保存到本机");
+    return;
+  }
+  queueCloudSave();
 }
 function queueCloudSave(){
   clearTimeout(cloudSaveTimer);
