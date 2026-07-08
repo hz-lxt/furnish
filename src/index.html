@@ -4,22 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>雍贤山庐 7-1004 装修预算总表</title>
+<script>
+(function(){
+  try{
+    const theme=localStorage.getItem('yxsl_budget_theme');
+    if(theme==='dark') document.documentElement.dataset.theme='dark';
+  }catch(e){}
+})();
+</script>
 <style>
 :root{
   --dark:#214E3B; --green:#376B55; --gold:#C79A52; --red:#C95252;
   --bg:#F4F7F5; --card:#FFFFFF; --line:#E3EAE5; --ink:#24312B; --muted:#6D7771;
   --paid-bg:#E5F3E9; --budget-bg:#FBF7EF; --unpaid-bg:#FCE8E6;
+  --body-bg:linear-gradient(135deg,#EDF4EF 0%,#F4F7F5 100%);
+  --shadow:rgba(33,78,59,.08); --shadow-strong:rgba(33,78,59,.18);
+  --header-start:#214E3B; --header-end:#376B55; --primary-bg:#214E3B; --primary-fg:#FFFFFF;
+}
+:root[data-theme="dark"]{
+  --dark:#CFE7DB; --green:#8DB8A1; --gold:#D6A95E; --red:#E17870;
+  --bg:#111815; --card:#18231E; --line:#2B3A33; --ink:#EDF5F0; --muted:#A9B9B0;
+  --paid-bg:#1D3429; --budget-bg:#302817; --unpaid-bg:#3A2221;
+  --body-bg:linear-gradient(135deg,#0E1512 0%,#16211C 100%);
+  --shadow:rgba(0,0,0,.28); --shadow-strong:rgba(0,0,0,.42);
+  --header-start:#14221C; --header-end:#203A2F; --primary-bg:#274637; --primary-fg:#FFFFFF;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
   font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
-  background:linear-gradient(135deg,#EDF4EF 0%,#F4F7F5 100%);
+  background:var(--body-bg);
   color:var(--ink); line-height:1.5; padding-bottom:60px; overflow-x:hidden;
 }
 /* ===== 顶部标题 ===== */
 header{
-  background:linear-gradient(120deg,var(--dark),var(--green));
+  background:linear-gradient(120deg,var(--header-start),var(--header-end));
   color:#fff; padding:32px 24px; position:relative; overflow:hidden;
   box-shadow:0 4px 20px rgba(33,78,59,.25);
 }
@@ -39,14 +58,14 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 }
 .kpi{
   background:var(--card); border-radius:16px; padding:18px 16px;
-  box-shadow:0 6px 20px rgba(33,78,59,.08); border:1px solid var(--line);
+  box-shadow:0 6px 20px var(--shadow); border:1px solid var(--line);
   opacity:0; transform:translateY(30px); animation:pop .6s forwards;
   transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
   position:relative; overflow:hidden;
 }
 .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent,var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .4s}
 .kpi:hover::before{transform:scaleX(1)}
-.kpi:hover{transform:translateY(-8px) scale(1.03); box-shadow:0 18px 36px rgba(33,78,59,.18)}
+.kpi:hover{transform:translateY(-8px) scale(1.03); box-shadow:0 18px 36px var(--shadow-strong)}
 .kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.12s}
 .kpi:nth-child(3){animation-delay:.19s}.kpi:nth-child(4){animation-delay:.26s}
 .kpi:nth-child(5){animation-delay:.33s}.kpi:nth-child(6){animation-delay:.40s}
@@ -62,20 +81,20 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 }
 .search{
   flex:1; min-width:200px; padding:11px 16px; border:1px solid var(--line); border-radius:10px;
-  font-size:14px; background:#fff; transition:.2s; outline:none;
+  font-size:14px; background:var(--card); color:var(--ink); transition:.2s; outline:none;
 }
 .search:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.15)}
 .btn{
   padding:11px 18px; border:none; border-radius:10px; cursor:pointer; font-size:14px;
   font-weight:600; transition:transform .2s, box-shadow .2s, background .2s, border-color .2s; font-family:inherit;
 }
-.btn-primary{background:var(--dark); color:#fff}
-.btn-primary:hover{background:var(--green); transform:translateY(-2px) scale(1.04); box-shadow:0 6px 16px rgba(33,78,59,.25)}
-.btn-ghost{background:#fff; color:var(--dark); border:1px solid var(--line)}
+.btn-primary{background:var(--primary-bg); color:var(--primary-fg)}
+.btn-primary:hover{background:var(--header-end); transform:translateY(-2px) scale(1.04); box-shadow:0 6px 16px rgba(33,78,59,.25)}
+.btn-ghost{background:var(--card); color:var(--dark); border:1px solid var(--line)}
 .btn-ghost:hover{background:var(--bg); transform:translateY(-1px) scale(1.04)}
 .btn:active,.chip:active,.status-badge:active,.drag-handle:active{transform:scale(.96)}
 .btn-mini{padding:6px 10px;border-radius:8px;font-size:12px}
-.chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:#fff;transition:transform .2s, border-color .2s, background .2s}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);transition:transform .2s, border-color .2s, background .2s}
 .chip:hover{border-color:var(--green);transform:scale(1.06)}
 .chip.active{background:var(--green);color:#fff;border-color:var(--green)}
 /* ===== 阶段块 ===== */
@@ -87,7 +106,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 @keyframes rise{to{opacity:1;transform:translateY(0)}}
 .stage-head{
   display:flex; align-items:center; justify-content:space-between; gap:12px;
-  background:linear-gradient(100deg,var(--dark) 0%,var(--green) 60%,#2f6650 100%); color:#fff;
+  background:linear-gradient(100deg,var(--header-start) 0%,var(--header-end) 60%,#2f6650 100%); color:#fff;
   padding:14px 22px; border-radius:14px 14px 0 0; cursor:pointer;
   box-shadow:0 4px 14px rgba(33,78,59,.18); position:relative; overflow:hidden;
   transition:box-shadow .3s, transform .3s;
@@ -115,7 +134,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage-sum{font-size:13px; color:#fff; display:flex; gap:16px; flex-wrap:wrap; z-index:1}
 .stage-sum span{background:rgba(255,255,255,.14); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px)}
 .stage-sum b{color:#FFE1A6; font-weight:700}
-.table-wrap{background:#fff; border:1px solid var(--line); border-top:none; border-radius:0 0 14px 14px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 6px 20px rgba(33,78,59,.06)}
+.table-wrap{background:var(--card); border:1px solid var(--line); border-top:none; border-radius:0 0 14px 14px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 6px 20px var(--shadow)}
 /* 回款节点：区别于普通节点的配色 */
 .stage.rebate .stage-head{background:linear-gradient(100deg,#7A5B12 0%,#A97E22 60%,#C79A52 100%)}
 .stage.rebate thead th{background:#8A6A1C}
@@ -124,7 +143,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage.collapsed .table-wrap{max-height:0!important; opacity:0; border:none}
 table{width:100%; border-collapse:collapse; font-size:13px}
 thead th{
-  background:var(--dark); color:#fff; font-weight:600; padding:12px 12px; text-align:left;
+  background:var(--header-start); color:#fff; font-weight:600; padding:12px 12px; text-align:left;
   position:sticky; top:0; white-space:nowrap; font-size:12px;
 }
 thead th:first-child{padding-left:22px}
@@ -134,13 +153,13 @@ tbody td:first-child .cell{margin-left:12px}
 tbody td.money .cell{margin-right:12px}
 tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
 tbody tr{transition:background .2s}
-tbody tr:hover{background:#F0F6F2}
+tbody tr:hover{background:var(--bg)}
 tbody tr:hover .cell{background:transparent}
 .stage.drag-over .stage-head{outline:2px dashed #FFE1A6; outline-offset:-5px}
 .stage.dragging{opacity:.55}
-tfoot td{border-top:1px solid var(--line);background:#FAFCFB;padding:8px 12px}
-.add-row-btn{width:100%;text-align:left;background:#fff;color:var(--dark);border:1px dashed var(--gold)}
-.add-row-btn:hover{background:#FBF7EF}
+tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
+.add-row-btn{width:100%;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
+.add-row-btn:hover{background:var(--budget-bg)}
 .drag-handle{
   display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:0 0 22px;
   border:1px solid rgba(255,255,255,.5);border-radius:7px;background:rgba(255,255,255,.16);color:#fff;cursor:grab;
@@ -153,8 +172,8 @@ tfoot td{border-top:1px solid var(--line);background:#FAFCFB;padding:8px 12px}
   border:2px solid transparent; border-radius:6px; margin:2px;
   flex:1;
 }
-.cell:hover{background:#EDF4EF}
-.cell:focus{background:#fff; border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.12)}
+.cell:hover{background:var(--bg)}
+.cell:focus{background:var(--card); border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.12)}
 .cell.saved{animation:flash .7s}
 @keyframes flash{0%{background:#C6EFCE}100%{background:transparent}}
 td.money .cell{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
@@ -193,9 +212,9 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));width:0;border-radius:10px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
 /* ===== 图表区 ===== */
 .charts{max-width:1280px;margin:20px auto 8px;padding:0 24px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
-.chart-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 6px 20px rgba(33,78,59,.07);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
+.chart-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 6px 20px var(--shadow);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
 .chart-card.in{animation:rise .7s forwards}
-.chart-card:hover{box-shadow:0 14px 30px rgba(33,78,59,.14);transform:translateY(-4px)}
+.chart-card:hover{box-shadow:0 14px 30px var(--shadow-strong);transform:translateY(-4px)}
 .chart-card h3{font-size:15px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
 .chart-card h3::before{content:"";width:5px;height:16px;background:var(--gold);border-radius:3px}
 .chart-card canvas{width:100%;display:block}
@@ -282,6 +301,7 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   <button class="btn btn-ghost" id="sortAsc">类别正序</button>
   <button class="btn btn-ghost" id="sortDesc">类别倒序</button>
   <button class="btn btn-ghost" id="expandAll">展开/收起全部</button>
+  <button class="btn btn-ghost" id="themeToggle" title="切换明暗模式">深色模式</button>
   <button class="btn btn-ghost hidden" id="exportBtn">⬇ 导出数据</button>
   <button class="btn btn-ghost hidden" id="importBtn">⬆ 导入数据</button>
   <button class="btn btn-primary" id="reset">恢复初始数据</button>
@@ -742,6 +762,17 @@ document.getElementById('expandAll').addEventListener('click',()=>{
   const anyOpen=[...stages].some(s=>!s.classList.contains('collapsed'));
   stages.forEach(s=>s.classList.toggle('collapsed',anyOpen));
 });
+function syncThemeButton(){
+  const btn=document.getElementById('themeToggle');
+  if(btn) btn.textContent=document.documentElement.dataset.theme==='dark'?'浅色模式':'深色模式';
+}
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const dark=document.documentElement.dataset.theme!=='dark';
+  document.documentElement.dataset.theme=dark?'dark':'';
+  try{localStorage.setItem('yxsl_budget_theme',dark?'dark':'light');}catch(e){}
+  syncThemeButton();
+  drawCharts();
+});
 document.getElementById('sortAsc').addEventListener('click',()=>sortCategories('asc'));
 document.getElementById('sortDesc').addEventListener('click',()=>sortCategories('desc'));
 document.getElementById('reset').addEventListener('click',()=>{
@@ -808,6 +839,9 @@ function setupCanvas(cv, cssH){
   return {ctx,w,h:cssH};
 }
 let chartAnim=0;
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
 function drawCharts(){
   cancelAnimationFrame(chartAnim);
   const t0=performance.now(), dur=900, ease=t=>1-Math.pow(1-t,3);
@@ -837,19 +871,19 @@ function drawBar(prog){
   rows.forEach((d,i)=>{
     const cy=padT+i*rowH+rowH/2;
     // label
-    ctx.fillStyle='#24312B'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillStyle=cssVar('--ink'); ctx.textAlign='right'; ctx.textBaseline='middle';
     ctx.fillText(d.name.length>7?d.name.slice(0,7):d.name, padL-10, cy);
     // budget bar
     const bw=chartW*(d.budget/max)*prog;
-    roundRect(ctx,padL,cy-bh-1,bw,bh,3); ctx.fillStyle='#C79A52'; ctx.fill();
+    roundRect(ctx,padL,cy-bh-1,bw,bh,3); ctx.fillStyle=cssVar('--gold'); ctx.fill();
     // paid bar
     const pw=chartW*(d.paid/max)*prog;
-    roundRect(ctx,padL,cy+1,pw,bh,3); ctx.fillStyle='#376B55'; ctx.fill();
+    roundRect(ctx,padL,cy+1,pw,bh,3); ctx.fillStyle=cssVar('--green'); ctx.fill();
     // value labels (both bars)
     if(prog>0.9){
       ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font='10px sans-serif';
-      ctx.fillStyle='#B07D2E'; ctx.fillText('¥'+fmt(d.budget), padL+bw+5, cy-bh/2-1);
-      ctx.fillStyle='#2C5A46'; ctx.fillText('¥'+fmt(d.paid), padL+pw+5, cy+bh/2+2);
+      ctx.fillStyle=cssVar('--gold'); ctx.fillText('¥'+fmt(d.budget), padL+bw+5, cy-bh/2-1);
+      ctx.fillStyle=cssVar('--green'); ctx.fillText('¥'+fmt(d.paid), padL+pw+5, cy+bh/2+2);
     }
     ctx.font='11px "PingFang SC",sans-serif';
   });
@@ -860,8 +894,8 @@ function drawDonut(prog){
   ctx.clearRect(0,0,w,h);
   const k=calcKPI();
   const parts=[
-    {l:'已付款',v:k.paid,c:'#376B55'},
-    {l:'预计剩余未付',v:Math.max(k.remain,0),c:'#C79A52'},
+    {l:'已付款',v:k.paid,c:cssVar('--green')},
+    {l:'预计剩余未付',v:Math.max(k.remain,0),c:cssVar('--gold')},
   ];
   const total=parts.reduce((s,p)=>s+p.v,0)||1;
   const cx=w/2, cy=h/2-6, R=Math.min(w,h)/2-40, r=R*0.58;
@@ -874,13 +908,13 @@ function drawDonut(prog){
     start+=ang;
   });
   // inner hole
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=cssVar('--card'); ctx.fill();
   // center text
-  ctx.fillStyle='#214E3B'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle=cssVar('--dark'); ctx.textAlign='center'; ctx.textBaseline='middle';
   ctx.font='700 20px "PingFang SC",sans-serif';
   const donePct=Math.round(k.paid/(k.budget||1)*100*prog);
   ctx.fillText(donePct+'%', cx, cy-6);
-  ctx.fillStyle='#6D7771'; ctx.font='11px "PingFang SC",sans-serif';
+  ctx.fillStyle=cssVar('--muted'); ctx.font='11px "PingFang SC",sans-serif';
   ctx.fillText('已付占预算', cx, cy+14);
   // legend
   if(prog>0.95){
@@ -901,6 +935,7 @@ new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classLi
 document.querySelectorAll('.chart-card').forEach((c,i)=>{c.style.animationDelay=(i*.12)+'s';c.classList.add('in');});
 
 // ====== 初始化 ======
+syncThemeButton();
 renderKPI(); renderStages();
 initCloudData();
 // anime.js: KPI 卡片弹入进场
