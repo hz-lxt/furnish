@@ -388,9 +388,33 @@ function saveData(){
   if(applyingRemote) return;
   queueCloudSave();
 }
+function saveLocalData(){
+  localStorage.setItem(LS_KEY, JSON.stringify(DATA));
+}
 function queueCloudSave(){
   clearTimeout(cloudSaveTimer);
   cloudSaveTimer = setTimeout(saveCloudData,500);
+}
+async function saveLayoutChange(rpcName,payload){
+  saveLocalData();
+  cloudSaving = true;
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`,{
+      method:"POST",
+      headers:cloudHeaders(),
+      body:JSON.stringify(payload)
+    });
+    const body = await res.json().catch(()=>null);
+    if(!res.ok) throw new Error(body && body.message ? body.message : `同步失败 ${res.status}`);
+    if(body && body[0]){
+      cloudUpdatedAt = body[0].updated_at || cloudUpdatedAt;
+    }
+  }catch(e){
+    console.warn(e);
+    toast("云端同步失败，已保存在本机");
+  }finally{
+    cloudSaving = false;
+  }
 }
 async function saveCloudData(){
   const pass = getEditPassword();
@@ -504,14 +528,14 @@ function stageSum(s){
   return {b,p,u};
 }
 function sortCategories(dir){
-  if(!ensureEditAllowed()) return;
   DATA.forEach(s=>{
     s.items.sort((a,b)=>{
       const d = String(a.cat||'').localeCompare(String(b.cat||''),'zh-CN',{numeric:true});
       return dir==='desc' ? -d : d;
     });
   });
-  saveData(); renderKPI(); renderStages();
+  saveLocalData(); renderKPI(); renderStages();
+  saveLayoutChange("sort_budget_categories",{doc_id:CLOUD_DOC_ID,sort_dir:dir});
   toast(dir==='desc'?'已按类别倒序排序':'已按类别正序排序');
 }
 function emptyItemForStage(s){
@@ -644,12 +668,12 @@ function bindEditing(){
       const toSi=Number(this.dataset.si);
       const toIi=Number(this.dataset.ii);
       if(toSi!==dragRow.si || toIi===dragRow.ii) return;
-      if(!ensureEditAllowed()) return;
       const list=DATA[toSi].items;
       const [moved]=list.splice(dragRow.ii,1);
       const insertAt=dragRow.ii<toIi ? toIi-1 : toIi;
       list.splice(insertAt,0,moved);
-      saveData(); renderKPI(); renderStages();
+      saveLocalData(); renderKPI(); renderStages();
+      saveLayoutChange("reorder_budget_item",{doc_id:CLOUD_DOC_ID,stage_index:toSi,from_index:dragRow.ii,to_index:insertAt});
       toast('类别顺序已更新');
     });
   });
@@ -673,9 +697,9 @@ function bindEditing(){
     btn.addEventListener('click',function(e){
       e.stopPropagation();
       const si=Number(this.dataset.si);
-      if(!ensureEditAllowed()) return;
       DATA[si].pinned=!DATA[si].pinned;
-      saveData(); renderKPI(); renderStages();
+      saveLocalData(); renderKPI(); renderStages();
+      saveLayoutChange("set_budget_stage_pinned",{doc_id:CLOUD_DOC_ID,stage_index:si,is_pinned:!!DATA[si].pinned});
       toast(DATA[si].pinned?'已标记为正在进行':'已取消置顶');
     });
   });
