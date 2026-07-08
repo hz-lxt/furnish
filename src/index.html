@@ -136,18 +136,17 @@ tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
 tbody tr{transition:background .2s}
 tbody tr:hover{background:#F0F6F2}
 tbody tr:hover .cell{background:transparent}
-tbody tr.drag-over{background:#FFF6DF; outline:2px dashed var(--gold); outline-offset:-2px}
-tbody tr.dragging{opacity:.55}
+.stage.drag-over .stage-head{outline:2px dashed #FFE1A6; outline-offset:-5px}
+.stage.dragging{opacity:.55}
 tfoot td{border-top:1px solid var(--line);background:#FAFCFB;padding:8px 12px}
 .add-row-btn{width:100%;text-align:left;background:#fff;color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:#FBF7EF}
-.drag-cell{display:flex;align-items:center;gap:6px}
 .drag-handle{
   display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:0 0 22px;
-  border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--muted);cursor:grab;
+  border:1px solid rgba(255,255,255,.5);border-radius:7px;background:rgba(255,255,255,.16);color:#fff;cursor:grab;
   transition:transform .2s, border-color .2s, color .2s, box-shadow .2s;user-select:none;
 }
-.drag-handle:hover{transform:scale(1.16);border-color:var(--gold);color:var(--dark);box-shadow:0 3px 10px rgba(199,154,82,.18)}
+.drag-handle:hover{transform:scale(1.16);border-color:#FFE1A6;color:#FFE1A6;box-shadow:0 3px 10px rgba(199,154,82,.18)}
 .drag-handle:active{cursor:grabbing}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
@@ -542,13 +541,10 @@ function emptyItemForStage(s){
   if(s.noStat) return {cat:"回款",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"已完成",note:""};
   return {cat:"",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"未完成",note:""};
 }
-let dragRow=null;
+let dragStage=null;
 function renderStages(){
   const box=document.getElementById('stages'); box.innerHTML='';
-  DATA.map((s,si)=>({s,si})).sort((a,b)=>{
-    if(!!a.s.pinned!==!!b.s.pinned) return a.s.pinned ? -1 : 1;
-    return a.si-b.si;
-  }).forEach(({s,si})=>{
+  DATA.forEach((s,si)=>{
     const visible=s.items.filter(match);
     if(!visible.length && (keyword||filter!=='all')) return;
     const isRebate=!!s.noStat;
@@ -557,17 +553,13 @@ function renderStages(){
     const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':'')+(s.pinned?' pinned':''); el.dataset.si=si;
     let rows = s.items.map((it,ii)=>{
       if(!match(it)) return '';
-      const tds=cols.map((col,ci)=>{
+      const tds=cols.map(col=>{
         if(col.k==='status'){
           const done=it.status==='已完成';
           return `<td class="tdstatus" style="text-align:center"><span class="status-badge ${done?'done':'todo'}" data-si="${si}" data-ii="${ii}">${it.status||'未完成'}</span></td>`;
         }
         const isMoney=col.cls&&col.cls.includes('money');
         const val=isMoney?fmt(it[col.k]):(it[col.k]||'');
-        if(ci===0){
-          const handle=`<span class="drag-handle" draggable="true" data-si="${si}" data-ii="${ii}" title="拖动排序">⇅</span>`;
-          return `<td class="${col.cls||''}"><div class="drag-cell">${handle}<div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></div></td>`;
-        }
         return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></td>`;
       }).join('');
       return `<tr class="budget-row" data-si="${si}" data-ii="${ii}">${tds}</tr>`;
@@ -578,7 +570,7 @@ function renderStages(){
     const pinHtml = s.pinned ? `<span class="stage-pin">正在进行</span>` : '';
     el.innerHTML=`
       <div class="stage-head">
-        <h2><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isRebate?'♻ ':''}${s.stage}</span></span></h2>
+        <h2><span class="drag-handle stage-drag-handle" draggable="true" data-si="${si}" title="拖动整个类目">⇅</span><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isRebate?'♻ ':''}${s.stage}</span></span></h2>
         <div class="stage-actions">
           <div class="stage-sum">${sumHtml}</div>
           <button class="btn btn-ghost btn-mini pin-stage" data-si="${si}">${s.pinned?'取消置顶':'置顶节点'}</button>
@@ -640,41 +632,39 @@ function bindEditing(){
       renderKPI(); toast('状态已更新 → '+nv);
     });
   });
-  document.querySelectorAll('.drag-handle').forEach(handle=>{
+  document.querySelectorAll('.stage-drag-handle').forEach(handle=>{
     handle.addEventListener('dragstart',function(e){
-      dragRow={si:Number(this.dataset.si),ii:Number(this.dataset.ii)};
-      const row=this.closest('tr');
-      if(row) row.classList.add('dragging');
+      dragStage={si:Number(this.dataset.si)};
+      const stage=this.closest('.stage');
+      if(stage) stage.classList.add('dragging');
       e.dataTransfer.effectAllowed='move';
-      e.dataTransfer.setData('text/plain',JSON.stringify(dragRow));
+      e.dataTransfer.setData('text/plain',JSON.stringify(dragStage));
     });
     handle.addEventListener('dragend',function(){
-      document.querySelectorAll('tr.dragging,tr.drag-over').forEach(r=>r.classList.remove('dragging','drag-over'));
-      dragRow=null;
+      document.querySelectorAll('.stage.dragging,.stage.drag-over').forEach(s=>s.classList.remove('dragging','drag-over'));
+      dragStage=null;
     });
   });
-  document.querySelectorAll('tr.budget-row').forEach(row=>{
-    row.addEventListener('dragover',function(e){
-      if(!dragRow || Number(this.dataset.si)!==dragRow.si) return;
+  document.querySelectorAll('.stage').forEach(stage=>{
+    stage.addEventListener('dragover',function(e){
+      if(!dragStage) return;
       e.preventDefault();
       e.dataTransfer.dropEffect='move';
       this.classList.add('drag-over');
     });
-    row.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
-    row.addEventListener('drop',function(e){
+    stage.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
+    stage.addEventListener('drop',function(e){
       e.preventDefault();
       this.classList.remove('drag-over');
-      if(!dragRow) return;
+      if(!dragStage) return;
       const toSi=Number(this.dataset.si);
-      const toIi=Number(this.dataset.ii);
-      if(toSi!==dragRow.si || toIi===dragRow.ii) return;
-      const list=DATA[toSi].items;
-      const [moved]=list.splice(dragRow.ii,1);
-      const insertAt=dragRow.ii<toIi ? toIi-1 : toIi;
-      list.splice(insertAt,0,moved);
+      if(toSi===dragStage.si) return;
+      const [moved]=DATA.splice(dragStage.si,1);
+      const insertAt=dragStage.si<toSi ? toSi-1 : toSi;
+      DATA.splice(insertAt,0,moved);
       saveLocalData(); renderKPI(); renderStages();
-      saveLayoutChange("reorder_budget_item",{doc_id:CLOUD_DOC_ID,stage_index:toSi,from_index:dragRow.ii,to_index:insertAt});
-      toast('类别顺序已更新');
+      saveLayoutChange("reorder_budget_stage",{doc_id:CLOUD_DOC_ID,from_index:dragStage.si,to_index:insertAt});
+      toast('类目顺序已更新');
     });
   });
   document.querySelectorAll('.add-row-btn').forEach(btn=>{
@@ -697,10 +687,18 @@ function bindEditing(){
     btn.addEventListener('click',function(e){
       e.stopPropagation();
       const si=Number(this.dataset.si);
-      DATA[si].pinned=!DATA[si].pinned;
+      const nextPinned=!DATA[si].pinned;
+      DATA[si].pinned=nextPinned;
+      if(nextPinned && si>0){
+        const [stage]=DATA.splice(si,1);
+        DATA.unshift(stage);
+      }
       saveLocalData(); renderKPI(); renderStages();
-      saveLayoutChange("set_budget_stage_pinned",{doc_id:CLOUD_DOC_ID,stage_index:si,is_pinned:!!DATA[si].pinned});
-      toast(DATA[si].pinned?'已标记为正在进行':'已取消置顶');
+      (async()=>{
+        await saveLayoutChange("set_budget_stage_pinned",{doc_id:CLOUD_DOC_ID,stage_index:si,is_pinned:nextPinned});
+        if(nextPinned && si>0) await saveLayoutChange("reorder_budget_stage",{doc_id:CLOUD_DOC_ID,from_index:si,to_index:0});
+      })();
+      toast(nextPinned?'已标记为正在进行':'已取消置顶');
     });
   });
 }
