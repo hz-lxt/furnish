@@ -22,7 +22,7 @@
   --header-start:#214E3B; --header-end:#376B55; --primary-bg:#214E3B; --primary-fg:#FFFFFF;
 }
 :root[data-theme="dark"]{
-  --dark:#CFE7DB; --green:#8DB8A1; --gold:#D6A95E; --red:#E17870;
+  --dark:#D9EFE4; --green:#A7D8BD; --gold:#D6A95E; --red:#E17870;
   --bg:#111815; --card:#18231E; --line:#2B3A33; --ink:#EDF5F0; --muted:#A9B9B0;
   --paid-bg:#1D3429; --budget-bg:#302817; --unpaid-bg:#3A2221;
   --body-bg:linear-gradient(135deg,#0E1512 0%,#16211C 100%);
@@ -43,21 +43,19 @@ header{
   box-shadow:0 4px 20px rgba(33,78,59,.25);
 }
 header::after{
-  content:""; position:absolute; top:-50%; right:-10%; width:400px; height:400px;
-  background:radial-gradient(circle,rgba(199,154,82,.25),transparent 70%);
-  animation:float 8s ease-in-out infinite;
+  content:""; position:absolute; inset:auto 0 0 0; height:1px;
+  background:rgba(255,255,255,.18);
 }
-@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,20px)}}
 header h1{font-size:26px; font-weight:700; letter-spacing:1px; animation:slideDown .8s cubic-bezier(.2,.8,.2,1)}
 header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:slideDown .8s .1s backwards}
 @keyframes slideDown{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
 /* ===== KPI 卡片 ===== */
 .kpis{
   display:grid; grid-template-columns:repeat(6,1fr); gap:14px;
-  max-width:1280px; margin:-30px auto 0; padding:0 24px; position:relative; z-index:5;
+  max-width:1280px; margin:18px auto 0; padding:0 24px; position:relative; z-index:5;
 }
 .kpi{
-  background:var(--card); border-radius:16px; padding:18px 16px;
+  background:var(--card); border-radius:8px; padding:16px 14px;
   box-shadow:0 6px 20px var(--shadow); border:1px solid var(--line);
   opacity:0; transform:translateY(30px); animation:pop .6s forwards;
   transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
@@ -65,7 +63,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 }
 .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent,var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .4s}
 .kpi:hover::before{transform:scaleX(1)}
-.kpi:hover{transform:translateY(-8px) scale(1.03); box-shadow:0 18px 36px var(--shadow-strong)}
+.kpi:hover{transform:translateY(-2px); box-shadow:0 10px 22px var(--shadow-strong)}
 .kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.12s}
 .kpi:nth-child(3){animation-delay:.19s}.kpi:nth-child(4){animation-delay:.26s}
 .kpi:nth-child(5){animation-delay:.33s}.kpi:nth-child(6){animation-delay:.40s}
@@ -89,9 +87,9 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
   font-weight:600; transition:transform .2s, box-shadow .2s, background .2s, border-color .2s; font-family:inherit;
 }
 .btn-primary{background:var(--primary-bg); color:var(--primary-fg)}
-.btn-primary:hover{background:var(--header-end); transform:translateY(-2px) scale(1.04); box-shadow:0 6px 16px rgba(33,78,59,.25)}
+.btn-primary:hover{background:var(--header-end); transform:translateY(-1px); box-shadow:0 6px 16px rgba(33,78,59,.25)}
 .btn-ghost{background:var(--card); color:var(--dark); border:1px solid var(--line)}
-.btn-ghost:hover{background:var(--bg); transform:translateY(-1px) scale(1.04)}
+.btn-ghost:hover{background:var(--bg); transform:translateY(-1px)}
 .btn:active,.chip:active,.status-badge:active,.drag-handle:active{transform:scale(.96)}
 .btn-mini{padding:6px 10px;border-radius:8px;font-size:12px}
 .chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);transition:transform .2s, border-color .2s, background .2s}
@@ -107,7 +105,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage-head{
   display:flex; align-items:center; justify-content:space-between; gap:12px;
   background:linear-gradient(100deg,var(--header-start) 0%,var(--header-end) 60%,#2f6650 100%); color:#fff;
-  padding:14px 22px; border-radius:14px 14px 0 0; cursor:pointer;
+  padding:13px 18px; border-radius:8px 8px 0 0; cursor:pointer;
   box-shadow:0 4px 14px rgba(33,78,59,.18); position:relative; overflow:hidden;
   transition:box-shadow .3s, transform .3s;
 }
@@ -134,7 +132,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage-sum{font-size:13px; color:#fff; display:flex; gap:16px; flex-wrap:wrap; z-index:1}
 .stage-sum span{background:rgba(255,255,255,.14); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px)}
 .stage-sum b{color:#FFE1A6; font-weight:700}
-.table-wrap{background:var(--card); border:1px solid var(--line); border-top:none; border-radius:0 0 14px 14px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 6px 20px var(--shadow)}
+.table-wrap{background:var(--card); border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 4px 14px var(--shadow)}
 /* 回款节点：区别于普通节点的配色 */
 .stage.rebate .stage-head{background:linear-gradient(100deg,#7A5B12 0%,#A97E22 60%,#C79A52 100%)}
 .stage.rebate thead th{background:#8A6A1C}
@@ -212,9 +210,9 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));width:0;border-radius:10px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
 /* ===== 图表区 ===== */
 .charts{max-width:1280px;margin:20px auto 8px;padding:0 24px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
-.chart-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 6px 20px var(--shadow);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
+.chart-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;box-shadow:0 4px 14px var(--shadow);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
 .chart-card.in{animation:rise .7s forwards}
-.chart-card:hover{box-shadow:0 14px 30px var(--shadow-strong);transform:translateY(-4px)}
+.chart-card:hover{box-shadow:0 10px 22px var(--shadow-strong);transform:translateY(-2px)}
 .chart-card h3{font-size:15px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
 .chart-card h3::before{content:"";width:5px;height:16px;background:var(--gold);border-radius:3px}
 .chart-card canvas{width:100%;display:block}
