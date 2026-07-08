@@ -90,7 +90,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .btn-primary:hover{background:var(--header-end); transform:translateY(-1px); box-shadow:0 6px 16px rgba(33,78,59,.25)}
 .btn-ghost{background:var(--card); color:var(--dark); border:1px solid var(--line)}
 .btn-ghost:hover{background:var(--bg); transform:translateY(-1px)}
-.btn:active,.chip:active,.status-badge:active,.drag-handle:active{transform:scale(.96)}
+.btn:active,.chip:active,.status-badge:active{transform:scale(.96)}
 .btn-mini{padding:6px 10px;border-radius:8px;font-size:12px}
 .chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);transition:transform .2s, border-color .2s, background .2s}
 .chip:hover{border-color:var(--green);transform:scale(1.06)}
@@ -153,18 +153,9 @@ tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
 tbody tr{transition:background .2s}
 tbody tr:hover{background:var(--bg)}
 tbody tr:hover .cell{background:transparent}
-.stage.drag-over .stage-head{outline:2px dashed #FFE1A6; outline-offset:-5px}
-.stage.dragging{opacity:.55}
 tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
 .add-row-btn{width:100%;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:var(--budget-bg)}
-.drag-handle{
-  display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:0 0 22px;
-  border:1px solid rgba(255,255,255,.5);border-radius:7px;background:rgba(255,255,255,.16);color:#fff;cursor:grab;
-  transition:transform .2s, border-color .2s, color .2s, box-shadow .2s;user-select:none;
-}
-.drag-handle:hover{transform:scale(1.16);border-color:#FFE1A6;color:#FFE1A6;box-shadow:0 3px 10px rgba(199,154,82,.18)}
-.drag-handle:active{cursor:grabbing}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
@@ -208,6 +199,19 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 .progress-wrap{max-width:1280px;margin:0 auto 8px;padding:0 24px}
 .progress-track{height:10px;background:#E3EAE5;border-radius:10px;overflow:hidden}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));width:0;border-radius:10px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.achievement-strip{
+  margin-top:10px;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px;
+  background:rgba(255,255,255,.48);border:1px solid rgba(255,255,255,.42);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:0 8px 24px var(--shadow);border-radius:8px;padding:10px;
+}
+:root[data-theme="dark"] .achievement-strip{background:rgba(24,35,30,.62);border-color:rgba(255,255,255,.08)}
+.achievement-item{min-width:0;border-left:3px solid var(--gold);padding-left:10px}
+.achievement-label{font-size:11px;color:var(--muted);margin-bottom:2px}
+.achievement-value{font-size:14px;color:var(--ink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.burst-piece{position:fixed;width:6px;height:10px;border-radius:2px;pointer-events:none;z-index:200;animation:burstFly .8s ease-out forwards}
+@keyframes burstFly{to{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.burst-piece{display:none}}
 /* ===== 图表区 ===== */
 .charts{max-width:1280px;margin:20px auto 8px;padding:0 24px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
 .chart-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;box-shadow:0 4px 14px var(--shadow);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
@@ -234,6 +238,7 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   .kpi .value{font-size:19px}
   .kpi .label{font-size:11px}
   .progress-wrap,.charts,.toolbar,.stage,.footer{padding-left:14px;padding-right:14px}
+  .achievement-strip{grid-template-columns:1fr}
   .toolbar{gap:8px}
   .search{min-width:0;flex:1 1 100%}
   .chip{flex:1;text-align:center}
@@ -272,6 +277,20 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 <div class="progress-wrap">
   <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
   <div class="progress-label" id="progLabel"></div>
+  <div class="achievement-strip" id="achievementStrip">
+    <div class="achievement-item">
+      <div class="achievement-label">完成率</div>
+      <div class="achievement-value" id="achPct">0%</div>
+    </div>
+    <div class="achievement-item">
+      <div class="achievement-label">已完成</div>
+      <div class="achievement-value" id="achDone">0 项</div>
+    </div>
+    <div class="achievement-item">
+      <div class="achievement-label">当前推进</div>
+      <div class="achievement-value" id="achCurrent">-</div>
+    </div>
+  </div>
 </div>
 
 <div class="charts">
@@ -296,8 +315,6 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   <span class="chip active" data-f="all">全部</span>
   <span class="chip" data-f="done">已完成</span>
   <span class="chip" data-f="todo">未完成</span>
-  <button class="btn btn-ghost" id="sortAsc">类别正序</button>
-  <button class="btn btn-ghost" id="sortDesc">类别倒序</button>
   <button class="btn btn-ghost" id="expandAll">展开/收起全部</button>
   <button class="btn btn-ghost" id="themeToggle" title="切换明暗模式">深色模式</button>
   <button class="btn btn-ghost hidden" id="exportBtn">⬇ 导出数据</button>
@@ -514,6 +531,12 @@ function renderKPI(){
   const pct = k.done+k.todo ? Math.round(k.done/(k.done+k.todo)*100) : 0;
   setTimeout(()=>{document.getElementById('progFill').style.width=pct+'%';},200);
   document.getElementById('progLabel').textContent=`节点完成进度 ${k.done}/${k.done+k.todo} · ${pct}%`;
+  const achPct=document.getElementById('achPct');
+  const achDone=document.getElementById('achDone');
+  const achCurrent=document.getElementById('achCurrent');
+  if(achPct) achPct.textContent=pct+'%';
+  if(achDone) achDone.textContent=`${k.done} / ${k.done+k.todo} 项`;
+  if(achCurrent) achCurrent.textContent=currentStageName();
   const nc=document.getElementById('nodeCount'); if(nc)nc.textContent=k.done+k.todo;
   drawCharts();
 }
@@ -544,25 +567,29 @@ function stageSum(s){
   s.items.forEach(it=>{b+=Number(it.budget)||0;p+=Number(it.paid)||0;u+=Number(it.unpaid)||0;});
   return {b,p,u};
 }
-function sortCategories(dir){
-  DATA.forEach(s=>{
-    s.items.sort((a,b)=>{
-      const d = String(a.cat||'').localeCompare(String(b.cat||''),'zh-CN',{numeric:true});
-      return dir==='desc' ? -d : d;
-    });
+function stageOrder(s){
+  const m=String(s.stage||'').match(/^(\d+)/);
+  return m ? Number(m[1]) : 9999;
+}
+function orderedStageEntries(){
+  return DATA.map((s,si)=>({s,si})).sort((a,b)=>{
+    if(!!a.s.pinned!==!!b.s.pinned) return a.s.pinned ? -1 : 1;
+    return stageOrder(a.s)-stageOrder(b.s) || a.si-b.si;
   });
-  saveLocalData(); renderKPI(); renderStages();
-  saveLayoutChange("sort_budget_categories",{doc_id:CLOUD_DOC_ID,sort_dir:dir});
-  toast(dir==='desc'?'已按类别倒序排序':'已按类别正序排序');
+}
+function currentStageName(){
+  const pinned=orderedStageEntries().find(({s})=>s.pinned);
+  const active=pinned || orderedStageEntries().find(({s})=>!s.noStat && s.items.some(it=>it.status!=='已完成'));
+  if(!active) return '全部完成';
+  return active.s.stage.replace(/^\d+\s*/,'');
 }
 function emptyItemForStage(s){
   if(s.noStat) return {cat:"回款",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"已完成",note:""};
   return {cat:"",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"未完成",note:""};
 }
-let dragStage=null;
 function renderStages(){
   const box=document.getElementById('stages'); box.innerHTML='';
-  DATA.forEach((s,si)=>{
+  orderedStageEntries().forEach(({s,si})=>{
     const visible=s.items.filter(match);
     if(!visible.length && (keyword||filter!=='all')) return;
     const isRebate=!!s.noStat;
@@ -588,7 +615,7 @@ function renderStages(){
     const pinHtml = s.pinned ? `<span class="stage-pin">正在进行</span>` : '';
     el.innerHTML=`
       <div class="stage-head">
-        <h2><span class="drag-handle stage-drag-handle" draggable="true" data-si="${si}" title="拖动整个类目">⇅</span><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isRebate?'♻ ':''}${s.stage}</span></span></h2>
+        <h2><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isRebate?'♻ ':''}${s.stage}</span></span></h2>
         <div class="stage-actions">
           <div class="stage-sum">${sumHtml}</div>
           <button class="btn btn-ghost btn-mini pin-stage" data-si="${si}">${s.pinned?'取消置顶':'置顶节点'}</button>
@@ -612,6 +639,24 @@ function renderStages(){
 }
 
 // ====== 编辑与保存 ======
+function fireCompletionBurst(el){
+  if(!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rect=el.getBoundingClientRect();
+  const colors=[cssVar('--gold')||'#C79A52',cssVar('--green')||'#376B55',cssVar('--red')||'#C95252','#ffffff'];
+  for(let i=0;i<18;i++){
+    const p=document.createElement('span');
+    const angle=(i/18)*Math.PI*2;
+    const distance=42+Math.random()*36;
+    p.className='burst-piece';
+    p.style.left=(rect.left+rect.width/2)+'px';
+    p.style.top=(rect.top+rect.height/2)+'px';
+    p.style.background=colors[i%colors.length];
+    p.style.setProperty('--dx',(Math.cos(angle)*distance)+'px');
+    p.style.setProperty('--dy',(Math.sin(angle)*distance-18)+'px');
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),900);
+  }
+}
 function bindEditing(){
   document.querySelectorAll('.cell').forEach(cell=>{
     cell.addEventListener('blur',function(){
@@ -647,42 +692,8 @@ function bindEditing(){
       this.textContent=nv;
       this.className='status-badge '+(nv==='已完成'?'done':'todo');
       if(window.anime){anime({targets:this,scale:[{value:1.25,duration:140},{value:1,duration:260}],easing:'easeOutBack'});}
+      if(nv==='已完成') fireCompletionBurst(this);
       renderKPI(); toast('状态已更新 → '+nv);
-    });
-  });
-  document.querySelectorAll('.stage-drag-handle').forEach(handle=>{
-    handle.addEventListener('dragstart',function(e){
-      dragStage={si:Number(this.dataset.si)};
-      const stage=this.closest('.stage');
-      if(stage) stage.classList.add('dragging');
-      e.dataTransfer.effectAllowed='move';
-      e.dataTransfer.setData('text/plain',JSON.stringify(dragStage));
-    });
-    handle.addEventListener('dragend',function(){
-      document.querySelectorAll('.stage.dragging,.stage.drag-over').forEach(s=>s.classList.remove('dragging','drag-over'));
-      dragStage=null;
-    });
-  });
-  document.querySelectorAll('.stage').forEach(stage=>{
-    stage.addEventListener('dragover',function(e){
-      if(!dragStage) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect='move';
-      this.classList.add('drag-over');
-    });
-    stage.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
-    stage.addEventListener('drop',function(e){
-      e.preventDefault();
-      this.classList.remove('drag-over');
-      if(!dragStage) return;
-      const toSi=Number(this.dataset.si);
-      if(toSi===dragStage.si) return;
-      const [moved]=DATA.splice(dragStage.si,1);
-      const insertAt=dragStage.si<toSi ? toSi-1 : toSi;
-      DATA.splice(insertAt,0,moved);
-      saveLocalData(); renderKPI(); renderStages();
-      saveLayoutChange("reorder_budget_stage",{doc_id:CLOUD_DOC_ID,from_index:dragStage.si,to_index:insertAt});
-      toast('类目顺序已更新');
     });
   });
   document.querySelectorAll('.add-row-btn').forEach(btn=>{
@@ -707,15 +718,8 @@ function bindEditing(){
       const si=Number(this.dataset.si);
       const nextPinned=!DATA[si].pinned;
       DATA[si].pinned=nextPinned;
-      if(nextPinned && si>0){
-        const [stage]=DATA.splice(si,1);
-        DATA.unshift(stage);
-      }
       saveLocalData(); renderKPI(); renderStages();
-      (async()=>{
-        await saveLayoutChange("set_budget_stage_pinned",{doc_id:CLOUD_DOC_ID,stage_index:si,is_pinned:nextPinned});
-        if(nextPinned && si>0) await saveLayoutChange("reorder_budget_stage",{doc_id:CLOUD_DOC_ID,from_index:si,to_index:0});
-      })();
+      saveLayoutChange("set_budget_stage_pinned",{doc_id:CLOUD_DOC_ID,stage_index:si,is_pinned:nextPinned});
       toast(nextPinned?'已标记为正在进行':'已取消置顶');
     });
   });
@@ -771,8 +775,6 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
   syncThemeButton();
   drawCharts();
 });
-document.getElementById('sortAsc').addEventListener('click',()=>sortCategories('asc'));
-document.getElementById('sortDesc').addEventListener('click',()=>sortCategories('desc'));
 document.getElementById('reset').addEventListener('click',()=>{
   if(confirm('确定恢复到初始数据？你的所有本地修改将被清除。')){
     if(!ensureEditAllowed()) return;
