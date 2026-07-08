@@ -73,6 +73,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .btn-primary:hover{background:var(--green); transform:translateY(-2px); box-shadow:0 6px 16px rgba(33,78,59,.25)}
 .btn-ghost{background:#fff; color:var(--dark); border:1px solid var(--line)}
 .btn-ghost:hover{background:var(--bg)}
+.btn-mini{padding:6px 10px;border-radius:8px;font-size:12px}
 .chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:#fff;transition:.2s}
 .chip:hover{border-color:var(--green)}
 .chip.active{background:var(--green);color:#fff;border-color:var(--green)}
@@ -100,6 +101,14 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage-head h2{font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; letter-spacing:.5px; z-index:1; text-shadow:0 1px 2px rgba(0,0,0,.18)}
 .stage-head .caret{transition:transform .3s}
 .stage.collapsed .caret{transform:rotate(-90deg)}
+.stage-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stage-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;z-index:1}
+.stage-pin{
+  background:rgba(255,241,208,.95); color:#7A4F08; border:1px solid rgba(255,255,255,.4);
+  border-radius:999px; padding:3px 10px; font-size:12px; font-weight:700; text-shadow:none;
+}
+.stage.pinned .stage-head{background:linear-gradient(100deg,#7A4F08 0%,#A46D16 58%,#C79A52 100%)}
+.stage.pinned{order:-1}
 .stage-sum{font-size:13px; color:#fff; display:flex; gap:16px; flex-wrap:wrap; z-index:1}
 .stage-sum span{background:rgba(255,255,255,.14); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px)}
 .stage-sum b{color:#FFE1A6; font-weight:700}
@@ -124,6 +133,9 @@ tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
 tbody tr{transition:background .2s}
 tbody tr:hover{background:#F0F6F2}
 tbody tr:hover .cell{background:transparent}
+tfoot td{border-top:1px solid var(--line);background:#FAFCFB;padding:8px 12px}
+.add-row-btn{width:100%;text-align:left;background:#fff;color:var(--dark);border:1px dashed var(--gold)}
+.add-row-btn:hover{background:#FBF7EF}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
@@ -254,9 +266,11 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   <span class="chip active" data-f="all">全部</span>
   <span class="chip" data-f="done">已完成</span>
   <span class="chip" data-f="todo">未完成</span>
+  <button class="btn btn-ghost" id="sortAsc">类别正序</button>
+  <button class="btn btn-ghost" id="sortDesc">类别倒序</button>
   <button class="btn btn-ghost" id="expandAll">展开/收起全部</button>
-  <button class="btn btn-ghost" id="exportBtn">⬇ 导出数据</button>
-  <button class="btn btn-ghost" id="importBtn">⬆ 导入数据</button>
+  <button class="btn btn-ghost hidden" id="exportBtn">⬇ 导出数据</button>
+  <button class="btn btn-ghost hidden" id="importBtn">⬆ 导入数据</button>
   <button class="btn btn-primary" id="reset">恢复初始数据</button>
   <input type="file" id="importFile" accept=".json,application/json" style="display:none">
 </div>
@@ -473,15 +487,32 @@ function stageSum(s){
   s.items.forEach(it=>{b+=Number(it.budget)||0;p+=Number(it.paid)||0;u+=Number(it.unpaid)||0;});
   return {b,p,u};
 }
+function sortCategories(dir){
+  DATA.forEach(s=>{
+    s.items.sort((a,b)=>{
+      const d = String(a.cat||'').localeCompare(String(b.cat||''),'zh-CN',{numeric:true});
+      return dir==='desc' ? -d : d;
+    });
+  });
+  saveData(); renderKPI(); renderStages();
+  toast(dir==='desc'?'已按类别倒序排序':'已按类别正序排序');
+}
+function emptyItemForStage(s){
+  if(s.noStat) return {cat:"回款",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"已完成",note:""};
+  return {cat:"",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"未完成",note:""};
+}
 function renderStages(){
   const box=document.getElementById('stages'); box.innerHTML='';
-  DATA.forEach((s,si)=>{
+  DATA.map((s,si)=>({s,si})).sort((a,b)=>{
+    if(!!a.s.pinned!==!!b.s.pinned) return a.s.pinned ? -1 : 1;
+    return a.si-b.si;
+  }).forEach(({s,si})=>{
     const visible=s.items.filter(match);
     if(!visible.length && (keyword||filter!=='all')) return;
     const isRebate=!!s.noStat;
     const cols=isRebate?REBATE_COLS:COLS;
     const sum=stageSum(s);
-    const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':''); el.dataset.si=si;
+    const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':'')+(s.pinned?' pinned':''); el.dataset.si=si;
     let rows = s.items.map((it,ii)=>{
       if(!match(it)) return '';
       const tds=cols.map(col=>{
@@ -498,10 +529,14 @@ function renderStages(){
     const sumHtml = isRebate
       ? `<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`
       : `<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
+    const pinHtml = s.pinned ? `<span class="stage-pin">正在进行</span>` : '';
     el.innerHTML=`
       <div class="stage-head">
-        <h2><span class="caret">▾</span>${isRebate?'♻ ':''}${s.stage}</h2>
-        <div class="stage-sum">${sumHtml}</div>
+        <h2><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isRebate?'♻ ':''}${s.stage}</span></span></h2>
+        <div class="stage-actions">
+          <div class="stage-sum">${sumHtml}</div>
+          <button class="btn btn-ghost btn-mini pin-stage" data-si="${si}">${s.pinned?'取消置顶':'置顶节点'}</button>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -511,6 +546,7 @@ function renderStages(){
             return `<th class="${cm?'thmoney':cc}">${c.t}</th>`;
           }).join('')}</tr></thead>
           <tbody>${rows}</tbody>
+          <tfoot><tr><td><button class="btn btn-ghost btn-mini add-row-btn" data-si="${si}">+ 新增条目</button></td><td colspan="${cols.length-1}"></td></tr></tfoot>
         </table>
       </div>`;
     box.appendChild(el);
@@ -550,11 +586,37 @@ function bindEditing(){
       renderKPI(); toast('状态已更新 → '+nv);
     });
   });
+  document.querySelectorAll('.add-row-btn').forEach(btn=>{
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      const si=Number(this.dataset.si);
+      const item=emptyItemForStage(DATA[si]);
+      DATA[si].items.push(item);
+      saveData(); renderKPI(); renderStages();
+      toast('已新增条目');
+      setTimeout(()=>{
+        const ii=DATA[si].items.length-1;
+        const first=document.querySelector(`.cell[data-si="${si}"][data-ii="${ii}"]`);
+        if(first) first.focus();
+      },0);
+    });
+  });
+  document.querySelectorAll('.pin-stage').forEach(btn=>{
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      const si=Number(this.dataset.si);
+      DATA[si].pinned=!DATA[si].pinned;
+      saveData(); renderKPI(); renderStages();
+      toast(DATA[si].pinned?'已标记为正在进行':'已取消置顶');
+    });
+  });
 }
 function refreshStageSum(si){
   const s=DATA[si],sum=stageSum(s);
   const el=document.querySelector(`.stage[data-si="${si}"] .stage-sum`);
-  if(el)el.innerHTML=`<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
+  if(!el)return;
+  if(s.noStat) el.innerHTML=`<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`;
+  else el.innerHTML=`<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
 }
 
 // ====== 折叠 / 滚动动画 ======
@@ -574,7 +636,7 @@ function observeStages(){
   }),{threshold:.06});
   document.querySelectorAll('.stage').forEach(s=>io.observe(s));
   document.querySelectorAll('.stage-head').forEach(h=>{
-    h.addEventListener('click',e=>{ if(e.target.closest('.cell'))return; h.parentElement.classList.toggle('collapsed');});
+    h.addEventListener('click',e=>{ if(e.target.closest('button,.cell'))return; h.parentElement.classList.toggle('collapsed');});
   });
 }
 
@@ -589,10 +651,12 @@ document.getElementById('expandAll').addEventListener('click',()=>{
   const anyOpen=[...stages].some(s=>!s.classList.contains('collapsed'));
   stages.forEach(s=>s.classList.toggle('collapsed',anyOpen));
 });
+document.getElementById('sortAsc').addEventListener('click',()=>sortCategories('asc'));
+document.getElementById('sortDesc').addEventListener('click',()=>sortCategories('desc'));
 document.getElementById('reset').addEventListener('click',()=>{
   if(confirm('确定恢复到初始数据？你的所有本地修改将被清除。')){
     localStorage.removeItem(LS_KEY); DATA=JSON.parse(JSON.stringify(SEED));
-    renderKPI(); renderStages(); toast('已恢复初始数据');
+    saveData(); renderKPI(); renderStages(); toast('已恢复初始数据');
   }
 });
 // 导出数据为 JSON 文件
