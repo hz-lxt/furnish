@@ -67,15 +67,16 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .search:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.15)}
 .btn{
   padding:11px 18px; border:none; border-radius:10px; cursor:pointer; font-size:14px;
-  font-weight:600; transition:.2s; font-family:inherit;
+  font-weight:600; transition:transform .2s, box-shadow .2s, background .2s, border-color .2s; font-family:inherit;
 }
 .btn-primary{background:var(--dark); color:#fff}
-.btn-primary:hover{background:var(--green); transform:translateY(-2px); box-shadow:0 6px 16px rgba(33,78,59,.25)}
+.btn-primary:hover{background:var(--green); transform:translateY(-2px) scale(1.04); box-shadow:0 6px 16px rgba(33,78,59,.25)}
 .btn-ghost{background:#fff; color:var(--dark); border:1px solid var(--line)}
-.btn-ghost:hover{background:var(--bg)}
+.btn-ghost:hover{background:var(--bg); transform:translateY(-1px) scale(1.04)}
+.btn:active,.chip:active,.status-badge:active,.drag-handle:active{transform:scale(.96)}
 .btn-mini{padding:6px 10px;border-radius:8px;font-size:12px}
-.chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:#fff;transition:.2s}
-.chip:hover{border-color:var(--green)}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:#fff;transition:transform .2s, border-color .2s, background .2s}
+.chip:hover{border-color:var(--green);transform:scale(1.06)}
 .chip.active{background:var(--green);color:#fff;border-color:var(--green)}
 /* ===== 阶段块 ===== */
 .stage{
@@ -98,9 +99,11 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 }
 .stage-head:hover{box-shadow:0 8px 22px rgba(33,78,59,.28)}
 .stage-head:hover::before{opacity:1}
+.stage-head:hover .caret{transform:scale(1.18)}
 .stage-head h2{font-size:16px; font-weight:700; display:flex; align-items:center; gap:10px; letter-spacing:.5px; z-index:1; text-shadow:0 1px 2px rgba(0,0,0,.18)}
 .stage-head .caret{transition:transform .3s}
 .stage.collapsed .caret{transform:rotate(-90deg)}
+.stage.collapsed .stage-head:hover .caret{transform:rotate(-90deg) scale(1.18)}
 .stage-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .stage-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;z-index:1}
 .stage-pin{
@@ -133,12 +136,23 @@ tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
 tbody tr{transition:background .2s}
 tbody tr:hover{background:#F0F6F2}
 tbody tr:hover .cell{background:transparent}
+tbody tr.drag-over{background:#FFF6DF; outline:2px dashed var(--gold); outline-offset:-2px}
+tbody tr.dragging{opacity:.55}
 tfoot td{border-top:1px solid var(--line);background:#FAFCFB;padding:8px 12px}
 .add-row-btn{width:100%;text-align:left;background:#fff;color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:#FBF7EF}
+.drag-cell{display:flex;align-items:center;gap:6px}
+.drag-handle{
+  display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:0 0 22px;
+  border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--muted);cursor:grab;
+  transition:transform .2s, border-color .2s, color .2s, box-shadow .2s;user-select:none;
+}
+.drag-handle:hover{transform:scale(1.16);border-color:var(--gold);color:var(--dark);box-shadow:0 3px 10px rgba(199,154,82,.18)}
+.drag-handle:active{cursor:grabbing}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
+  flex:1;
 }
 .cell:hover{background:#EDF4EF}
 .cell:focus{background:#fff; border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.12)}
@@ -154,7 +168,7 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 }
 .status-badge.done{background:#C6EFCE; color:#227A3D}
 .status-badge.todo{background:#FFE7C2; color:#B9600F}
-.status-badge:hover{transform:scale(1.08)}
+.status-badge:hover{transform:scale(1.12)}
 /* ===== toast ===== */
 #toast{
   position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px);
@@ -234,7 +248,7 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 <body>
 <header>
   <h1>雍贤山庐 7-1004 装修预算总表</h1>
-  <p>127㎡ 毛坯住宅 · 实时可编辑 · 数据自动保存到本地浏览器</p>
+  <p>127㎡ 毛坯住宅</p>
 </header>
 
 <div class="kpis" id="kpis"></div>
@@ -363,13 +377,15 @@ function getEditPassword(){
   if(pass) sessionStorage.setItem(EDIT_PASS_KEY, pass);
   return pass;
 }
+function ensureEditAllowed(){
+  if(applyingRemote) return true;
+  if(getEditPassword()) return true;
+  toast("未输入编辑密码，未保存修改");
+  return false;
+}
 function saveData(){
   localStorage.setItem(LS_KEY, JSON.stringify(DATA));
   if(applyingRemote) return;
-  if(!getEditPassword()){
-    toast("未输入编辑密码，仅保存到本机");
-    return;
-  }
   queueCloudSave();
 }
 function queueCloudSave(){
@@ -488,6 +504,7 @@ function stageSum(s){
   return {b,p,u};
 }
 function sortCategories(dir){
+  if(!ensureEditAllowed()) return;
   DATA.forEach(s=>{
     s.items.sort((a,b)=>{
       const d = String(a.cat||'').localeCompare(String(b.cat||''),'zh-CN',{numeric:true});
@@ -501,6 +518,7 @@ function emptyItemForStage(s){
   if(s.noStat) return {cat:"回款",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"已完成",note:""};
   return {cat:"",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"未完成",note:""};
 }
+let dragRow=null;
 function renderStages(){
   const box=document.getElementById('stages'); box.innerHTML='';
   DATA.map((s,si)=>({s,si})).sort((a,b)=>{
@@ -515,16 +533,20 @@ function renderStages(){
     const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':'')+(s.pinned?' pinned':''); el.dataset.si=si;
     let rows = s.items.map((it,ii)=>{
       if(!match(it)) return '';
-      const tds=cols.map(col=>{
+      const tds=cols.map((col,ci)=>{
         if(col.k==='status'){
           const done=it.status==='已完成';
           return `<td class="tdstatus" style="text-align:center"><span class="status-badge ${done?'done':'todo'}" data-si="${si}" data-ii="${ii}">${it.status||'未完成'}</span></td>`;
         }
         const isMoney=col.cls&&col.cls.includes('money');
         const val=isMoney?fmt(it[col.k]):(it[col.k]||'');
+        if(ci===0){
+          const handle=`<span class="drag-handle" draggable="true" data-si="${si}" data-ii="${ii}" title="拖动排序">⇅</span>`;
+          return `<td class="${col.cls||''}"><div class="drag-cell">${handle}<div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></div></td>`;
+        }
         return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></td>`;
       }).join('');
-      return `<tr>${tds}</tr>`;
+      return `<tr class="budget-row" data-si="${si}" data-ii="${ii}">${tds}</tr>`;
     }).join('');
     const sumHtml = isRebate
       ? `<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`
@@ -562,6 +584,13 @@ function bindEditing(){
       const {si,ii,k}=this.dataset; const money=this.dataset.money==='1';
       let v=this.textContent.trim();
       if(money){v=v.replace(/[,¥\s]/g,''); v=v===''?0:(parseFloat(v)||0); this.textContent=fmt(v);}
+      const old=DATA[si].items[ii][k];
+      const same=money ? (Number(old)||0)===(Number(v)||0) : String(old||'')===String(v||'');
+      if(same) return;
+      if(!ensureEditAllowed()){
+        this.textContent=money?fmt(old):(old||'');
+        return;
+      }
       DATA[si].items[ii][k]=v;
       saveData(); renderKPI();
       this.classList.add('saved'); setTimeout(()=>this.classList.remove('saved'),700);
@@ -578,6 +607,7 @@ function bindEditing(){
       const {si,ii}=this.dataset;
       const cur=DATA[si].items[ii].status;
       const nv=cur==='已完成'?'未完成':'已完成';
+      if(!ensureEditAllowed()) return;
       DATA[si].items[ii].status=nv;
       saveData();
       this.textContent=nv;
@@ -586,10 +616,48 @@ function bindEditing(){
       renderKPI(); toast('状态已更新 → '+nv);
     });
   });
+  document.querySelectorAll('.drag-handle').forEach(handle=>{
+    handle.addEventListener('dragstart',function(e){
+      dragRow={si:Number(this.dataset.si),ii:Number(this.dataset.ii)};
+      const row=this.closest('tr');
+      if(row) row.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',JSON.stringify(dragRow));
+    });
+    handle.addEventListener('dragend',function(){
+      document.querySelectorAll('tr.dragging,tr.drag-over').forEach(r=>r.classList.remove('dragging','drag-over'));
+      dragRow=null;
+    });
+  });
+  document.querySelectorAll('tr.budget-row').forEach(row=>{
+    row.addEventListener('dragover',function(e){
+      if(!dragRow || Number(this.dataset.si)!==dragRow.si) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      this.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
+    row.addEventListener('drop',function(e){
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      if(!dragRow) return;
+      const toSi=Number(this.dataset.si);
+      const toIi=Number(this.dataset.ii);
+      if(toSi!==dragRow.si || toIi===dragRow.ii) return;
+      if(!ensureEditAllowed()) return;
+      const list=DATA[toSi].items;
+      const [moved]=list.splice(dragRow.ii,1);
+      const insertAt=dragRow.ii<toIi ? toIi-1 : toIi;
+      list.splice(insertAt,0,moved);
+      saveData(); renderKPI(); renderStages();
+      toast('类别顺序已更新');
+    });
+  });
   document.querySelectorAll('.add-row-btn').forEach(btn=>{
     btn.addEventListener('click',function(e){
       e.stopPropagation();
       const si=Number(this.dataset.si);
+      if(!ensureEditAllowed()) return;
       const item=emptyItemForStage(DATA[si]);
       DATA[si].items.push(item);
       saveData(); renderKPI(); renderStages();
@@ -605,6 +673,7 @@ function bindEditing(){
     btn.addEventListener('click',function(e){
       e.stopPropagation();
       const si=Number(this.dataset.si);
+      if(!ensureEditAllowed()) return;
       DATA[si].pinned=!DATA[si].pinned;
       saveData(); renderKPI(); renderStages();
       toast(DATA[si].pinned?'已标记为正在进行':'已取消置顶');
@@ -655,6 +724,7 @@ document.getElementById('sortAsc').addEventListener('click',()=>sortCategories('
 document.getElementById('sortDesc').addEventListener('click',()=>sortCategories('desc'));
 document.getElementById('reset').addEventListener('click',()=>{
   if(confirm('确定恢复到初始数据？你的所有本地修改将被清除。')){
+    if(!ensureEditAllowed()) return;
     localStorage.removeItem(LS_KEY); DATA=JSON.parse(JSON.stringify(SEED));
     saveData(); renderKPI(); renderStages(); toast('已恢复初始数据');
   }
@@ -680,6 +750,7 @@ document.getElementById('importFile').addEventListener('change',function(){
       const arr=JSON.parse(e.target.result);
       if(!Array.isArray(arr)||!arr[0]||!('items' in arr[0])) throw new Error('格式不符');
       if(confirm('确定用导入的数据覆盖当前内容？建议先导出备份。')){
+        if(!ensureEditAllowed()) return;
         DATA=arr; saveData(); renderKPI(); renderStages(); toast('导入成功 ✓');
       }
     }catch(err){ alert('导入失败：文件不是有效的预算数据 JSON。\n'+err.message); }
