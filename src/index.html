@@ -214,14 +214,32 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 @media(prefers-reduced-motion:reduce){.burst-piece{display:none}}
 /* ===== 图表区 ===== */
 .charts{max-width:1280px;margin:20px auto 8px;padding:0 24px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
-.chart-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;box-shadow:0 4px 14px var(--shadow);opacity:0;transform:translateY(24px);transition:transform .3s,box-shadow .3s}
-.chart-card.in{animation:rise .7s forwards}
-.chart-card:hover{box-shadow:0 10px 22px var(--shadow-strong);transform:translateY(-2px)}
+.chart-card{
+  background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;
+  box-shadow:0 4px 14px var(--shadow);opacity:0;transform:translateY(24px) scale(.985);
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),box-shadow .34s,border-color .34s,opacity .5s;
+  position:relative;overflow:hidden;will-change:transform;
+}
+.chart-card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(120deg,transparent 34%,rgba(255,255,255,.22) 50%,transparent 66%);
+  transform:translateX(-120%);transition:transform .7s cubic-bezier(.2,.8,.2,1);
+}
+.chart-card.in{opacity:1;transform:translateY(0) scale(1)}
+.chart-card:hover{
+  box-shadow:0 16px 34px var(--shadow-strong);transform:translateY(-8px) scale(1.025);
+  border-color:rgba(199,154,82,.45);
+}
+.chart-card:hover::after{transform:translateX(120%)}
 .chart-card h3{font-size:15px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
 .chart-card h3::before{content:"";width:5px;height:16px;background:var(--gold);border-radius:3px}
 .chart-card canvas{width:100%;display:block}
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted);justify-content:center}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+@media(prefers-reduced-motion:reduce){
+  .chart-card,.chart-card::after{transition:none}
+  .chart-card:hover{transform:none}
+}
 @media(max-width:900px){.charts{grid-template-columns:1fr}}
 .progress-label{font-size:12px;color:var(--muted);margin-top:5px;text-align:right}
 /* ===== 响应式 ===== */
