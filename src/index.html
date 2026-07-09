@@ -162,6 +162,8 @@ tbody tr:hover .cell{background:transparent}
 tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
 .add-row-btn{width:100%;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:var(--budget-bg)}
+.delete-row-btn{color:var(--red);border-color:rgba(201,82,82,.28);background:var(--card)}
+.delete-row-btn:hover{background:var(--unpaid-bg);transform:scale(1.06)}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
@@ -172,6 +174,7 @@ tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
 .cell.saved{animation:flash .7s}
 @keyframes flash{0%{background:#C6EFCE}100%{background:transparent}}
 tbody td:nth-child(2) .cell,tbody td:nth-child(8) .cell,.tdstatus{white-space:nowrap}
+.tdactions{text-align:center;white-space:nowrap;min-width:74px}
 td.money .cell{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
 td.budget .cell{background:var(--budget-bg)}
 td.paid .cell{color:var(--green); font-weight:600}
@@ -222,11 +225,13 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 /* ===== 图表区 ===== */
 .charts{max-width:1280px;margin:20px auto 8px;padding:0 24px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
 .chart-card{
-  background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;
-  box-shadow:0 4px 14px var(--shadow);opacity:0;transform:translateY(24px) scale(.985);
+  background:rgba(255,255,255,.46);border:1px solid rgba(255,255,255,.48);border-radius:8px;padding:16px 18px;
+  backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%);
+  box-shadow:0 4px 14px var(--shadow),inset 0 1px rgba(255,255,255,.48);opacity:0;transform:translateY(24px) scale(.985);
   transition:transform .34s cubic-bezier(.2,.8,.2,1),box-shadow .34s,border-color .34s,opacity .5s;
   position:relative;overflow:hidden;will-change:transform;
 }
+:root[data-theme="dark"] .chart-card{background:rgba(24,35,30,.58);border-color:rgba(255,255,255,.1);box-shadow:0 4px 14px var(--shadow),inset 0 1px rgba(255,255,255,.08)}
 .chart-card::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(120deg,transparent 34%,rgba(255,255,255,.22) 50%,transparent 66%);
@@ -234,8 +239,8 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 }
 .chart-card.in{opacity:1;transform:translateY(0) scale(1)}
 .chart-card:hover{
-  box-shadow:0 12px 24px var(--shadow-strong);transform:translateY(-3px) scale(1.01);
-  border-color:rgba(199,154,82,.45);
+  box-shadow:0 18px 38px var(--shadow-strong),inset 0 1px rgba(255,255,255,.62);transform:translateY(-8px) scale(1.035);
+  border-color:rgba(199,154,82,.62);
 }
 .chart-card:hover::after{transform:translateX(120%)}
 .chart-card h3{font-size:15px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
@@ -382,7 +387,7 @@ const LS_KEY = "yxsl_budget_v7";
 const SUPABASE_URL = "https://rqkaovjfqcuvscehdmyx.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxa2FvdmpmcWN1dnNjZWhkbXl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MTQyNTIsImV4cCI6MjA5OTA5MDI1Mn0.zqAcO99OrKyYVQewnDFEVV6Ol43F_Vb6Npm7WfDdyJ4";
 const CLOUD_DOC_ID = "main";
-const EDIT_PASS_KEY = "yxsl_budget_edit_password";
+const EDIT_PASS_KEY = "yxsl_budget_edit_password_v2";
 
 function loadData(){
   try{const s=localStorage.getItem(LS_KEY); if(s) return JSON.parse(s);}catch(e){}
@@ -625,6 +630,18 @@ function emptyItemForStage(s){
   if(s.noStat) return {cat:"回款",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"已完成",note:""};
   return {cat:"",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"未完成",note:""};
 }
+function rowHtml(it,si,ii,cols){
+  const tds=cols.map(col=>{
+    if(col.k==='status'){
+      const done=it.status==='已完成';
+      return `<td class="tdstatus" style="text-align:center"><span class="status-badge ${done?'done':'todo'}" data-si="${si}" data-ii="${ii}">${it.status||'未完成'}</span></td>`;
+    }
+    const isMoney=col.cls&&col.cls.includes('money');
+    const val=isMoney?fmt(it[col.k]):(it[col.k]||'');
+    return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></td>`;
+  }).join('');
+  return `<tr class="budget-row" data-si="${si}" data-ii="${ii}">${tds}<td class="tdactions"><button class="btn btn-ghost btn-mini delete-row-btn" data-si="${si}" data-ii="${ii}" title="删除条目">删除</button></td></tr>`;
+}
 function renderStages(){
   const box=document.getElementById('stages'); box.innerHTML='';
   orderedStageEntries().forEach(({s,si})=>{
@@ -634,19 +651,7 @@ function renderStages(){
     const cols=isRebate?REBATE_COLS:COLS;
     const sum=stageSum(s);
     const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':'')+(s.pinned?' pinned':''); el.dataset.si=si;
-    let rows = s.items.map((it,ii)=>{
-      if(!match(it)) return '';
-      const tds=cols.map(col=>{
-        if(col.k==='status'){
-          const done=it.status==='已完成';
-          return `<td class="tdstatus" style="text-align:center"><span class="status-badge ${done?'done':'todo'}" data-si="${si}" data-ii="${ii}">${it.status||'未完成'}</span></td>`;
-        }
-        const isMoney=col.cls&&col.cls.includes('money');
-        const val=isMoney?fmt(it[col.k]):(it[col.k]||'');
-        return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></td>`;
-      }).join('');
-      return `<tr class="budget-row" data-si="${si}" data-ii="${ii}">${tds}</tr>`;
-    }).join('');
+    let rows = s.items.map((it,ii)=>match(it)?rowHtml(it,si,ii,cols):'').join('');
     const sumHtml = isRebate
       ? `<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`
       : `<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
@@ -665,9 +670,9 @@ function renderStages(){
             const cm=c.cls&&c.cls.includes('money');
             const cc=(c.k==='status')?'thcenter':'';
             return `<th class="${cm?'thmoney':cc}">${c.t}</th>`;
-          }).join('')}</tr></thead>
+          }).join('')}<th class="thcenter">操作</th></tr></thead>
           <tbody>${rows}</tbody>
-          <tfoot><tr><td><button class="btn btn-ghost btn-mini add-row-btn" data-si="${si}">+ 新增条目</button></td><td colspan="${cols.length-1}"></td></tr></tfoot>
+          <tfoot><tr><td><button class="btn btn-ghost btn-mini add-row-btn" data-si="${si}">+ 新增条目</button></td><td colspan="${cols.length}"></td></tr></tfoot>
         </table>
       </div>`;
     box.appendChild(el);
@@ -695,45 +700,91 @@ function fireCompletionBurst(el){
     setTimeout(()=>p.remove(),900);
   }
 }
-function bindEditing(){
-  document.querySelectorAll('.cell').forEach(cell=>{
-    cell.addEventListener('blur',function(){
-      const {si,ii,k}=this.dataset; const money=this.dataset.money==='1';
-      let v=this.textContent.trim();
-      if(money){v=v.replace(/[,¥\s]/g,''); v=v===''?0:(parseFloat(v)||0); this.textContent=fmt(v);}
-      const old=DATA[si].items[ii][k];
-      const same=money ? (Number(old)||0)===(Number(v)||0) : String(old||'')===String(v||'');
-      if(same) return;
-      if(!ensureEditAllowed()){
-        this.textContent=money?fmt(old):(old||'');
-        return;
+function bindCell(cell){
+  cell.addEventListener('blur',function(){
+    const {si,ii,k}=this.dataset; const money=this.dataset.money==='1';
+    let v=this.textContent.trim();
+    if(money){v=v.replace(/[,¥\s]/g,''); v=v===''?0:(parseFloat(v)||0); this.textContent=fmt(v);}
+    const old=DATA[si].items[ii][k];
+    const same=money ? (Number(old)||0)===(Number(v)||0) : String(old||'')===String(v||'');
+    if(same) return;
+    if(!ensureEditAllowed()){
+      this.textContent=money?fmt(old):(old||'');
+      return;
+    }
+    DATA[si].items[ii][k]=v;
+    saveData(); renderKPI();
+    this.classList.add('saved'); setTimeout(()=>this.classList.remove('saved'),700);
+    toast('已保存 ✓');
+    refreshStageSum(si);
+  });
+  cell.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.blur();}
+  });
+}
+function bindStatusBadge(b){
+  b.addEventListener('click',function(){
+    const {si,ii}=this.dataset;
+    const cur=DATA[si].items[ii].status;
+    const nv=cur==='已完成'?'未完成':'已完成';
+    if(!ensureEditAllowed()) return;
+    DATA[si].items[ii].status=nv;
+    saveData();
+    this.textContent=nv;
+    this.className='status-badge '+(nv==='已完成'?'done':'todo');
+    if(window.anime){anime({targets:this,scale:[{value:1.25,duration:140},{value:1,duration:260}],easing:'easeOutBack'});}
+    if(nv==='已完成') fireCompletionBurst(this);
+    renderKPI(); toast('状态已更新 → '+nv);
+  });
+}
+function reindexStageRows(si){
+  document.querySelectorAll(`.budget-row[data-si="${si}"]`).forEach(row=>{
+    const ii=Number(row.dataset.ii);
+    row.querySelectorAll('[data-si]').forEach(el=>{el.dataset.si=si; el.dataset.ii=ii;});
+  });
+}
+function bindDeleteButton(btn){
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    const si=Number(this.dataset.si), ii=Number(this.dataset.ii);
+    const item=DATA[si]&&DATA[si].items[ii];
+    if(!item) return;
+    const label=item.name||item.cat||'这条记录';
+    if(!confirm(`确定删除「${label}」吗？`)) return;
+    if(!ensureEditAllowed()) return;
+    DATA[si].items.splice(ii,1);
+    saveData(); renderKPI(); refreshStageSum(si);
+    const row=this.closest('tr');
+    if(row) row.remove();
+    document.querySelectorAll(`.budget-row[data-si="${si}"]`).forEach(row=>{
+      const rowIi=Number(row.dataset.ii);
+      if(rowIi>ii){
+        row.dataset.ii=rowIi-1;
+        row.querySelectorAll('[data-ii]').forEach(el=>{el.dataset.ii=rowIi-1;});
       }
-      DATA[si].items[ii][k]=v;
-      saveData(); renderKPI();
-      this.classList.add('saved'); setTimeout(()=>this.classList.remove('saved'),700);
-      toast('已保存 ✓');
-      // 更新该阶段汇总
-      refreshStageSum(si);
     });
-    cell.addEventListener('keydown',function(e){
-      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.blur();}
-    });
+    reindexStageRows(si);
+    toast('条目已删除');
   });
-  document.querySelectorAll('.status-badge').forEach(b=>{
-    b.addEventListener('click',function(){
-      const {si,ii}=this.dataset;
-      const cur=DATA[si].items[ii].status;
-      const nv=cur==='已完成'?'未完成':'已完成';
-      if(!ensureEditAllowed()) return;
-      DATA[si].items[ii].status=nv;
-      saveData();
-      this.textContent=nv;
-      this.className='status-badge '+(nv==='已完成'?'done':'todo');
-      if(window.anime){anime({targets:this,scale:[{value:1.25,duration:140},{value:1,duration:260}],easing:'easeOutBack'});}
-      if(nv==='已完成') fireCompletionBurst(this);
-      renderKPI(); toast('状态已更新 → '+nv);
-    });
-  });
+}
+function bindRowControls(row){
+  row.querySelectorAll('.cell').forEach(bindCell);
+  row.querySelectorAll('.status-badge').forEach(bindStatusBadge);
+  row.querySelectorAll('.delete-row-btn').forEach(bindDeleteButton);
+}
+function appendRowToStage(si,item,ii){
+  const s=DATA[si];
+  const stage=document.querySelector(`.stage[data-si="${si}"]`);
+  const tbody=stage&&stage.querySelector('tbody');
+  if(!tbody) return false;
+  const cols=s.noStat?REBATE_COLS:COLS;
+  tbody.insertAdjacentHTML('beforeend',rowHtml(item,si,ii,cols));
+  const row=tbody.lastElementChild;
+  bindRowControls(row);
+  return row;
+}
+function bindEditing(){
+  document.querySelectorAll('.budget-row').forEach(bindRowControls);
   document.querySelectorAll('.add-row-btn').forEach(btn=>{
     btn.addEventListener('click',function(e){
       e.stopPropagation();
@@ -741,11 +792,12 @@ function bindEditing(){
       if(!ensureEditAllowed()) return;
       const item=emptyItemForStage(DATA[si]);
       DATA[si].items.push(item);
-      saveData(); renderKPI(); renderStages();
+      const ii=DATA[si].items.length-1;
+      saveData(); renderKPI(); refreshStageSum(si);
+      const row=appendRowToStage(si,item,ii);
       toast('已新增条目');
       setTimeout(()=>{
-        const ii=DATA[si].items.length-1;
-        const first=document.querySelector(`.cell[data-si="${si}"][data-ii="${ii}"]`);
+        const first=row?row.querySelector('.cell'):document.querySelector(`.cell[data-si="${si}"][data-ii="${ii}"]`);
         if(first) first.focus();
       },0);
     });
