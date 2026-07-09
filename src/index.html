@@ -20,6 +20,7 @@
   --body-bg:linear-gradient(135deg,#EDF4EF 0%,#F4F7F5 100%);
   --shadow:rgba(33,78,59,.08); --shadow-strong:rgba(33,78,59,.18);
   --header-start:#214E3B; --header-end:#376B55; --primary-bg:#214E3B; --primary-fg:#FFFFFF;
+  --chart-budget:#8F5F20; --chart-paid:#245E46; --chart-zero:#82908A;
 }
 :root[data-theme="dark"]{
   --dark:#D9EFE4; --green:#A7D8BD; --gold:#D6A95E; --red:#E17870;
@@ -28,18 +29,19 @@
   --body-bg:linear-gradient(135deg,#0E1512 0%,#16211C 100%);
   --shadow:rgba(0,0,0,.28); --shadow-strong:rgba(0,0,0,.42);
   --header-start:#14221C; --header-end:#203A2F; --primary-bg:#274637; --primary-fg:#FFFFFF;
+  --chart-budget:#E0B66D; --chart-paid:#99D4B5; --chart-zero:#93A39A;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
   font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
   background:var(--body-bg);
-  color:var(--ink); line-height:1.5; padding-bottom:60px; overflow-x:hidden;
+  color:var(--ink); line-height:1.5; padding-bottom:118px; overflow-x:hidden;
 }
 /* ===== 顶部标题 ===== */
 header{
   background:linear-gradient(120deg,var(--header-start),var(--header-end));
-  color:#fff; padding:32px 24px; position:relative; overflow:hidden;
+  color:#fff; padding:24px; position:relative; overflow:hidden;
   box-shadow:0 4px 20px rgba(33,78,59,.25);
 }
 header::after{
@@ -51,11 +53,11 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 @keyframes slideDown{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
 /* ===== KPI 卡片 ===== */
 .kpis{
-  display:grid; grid-template-columns:repeat(6,1fr); gap:14px;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
   max-width:1280px; margin:18px auto 0; padding:0 24px; position:relative; z-index:5;
 }
 .kpi{
-  background:var(--card); border-radius:8px; padding:16px 14px;
+  background:var(--card); border-radius:8px; padding:14px;
   box-shadow:0 6px 20px var(--shadow); border:1px solid var(--line);
   opacity:0; transform:translateY(30px); animation:pop .6s forwards;
   transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
@@ -63,14 +65,14 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 }
 .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent,var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .4s}
 .kpi:hover::before{transform:scaleX(1)}
-.kpi:hover{transform:translateY(-2px); box-shadow:0 10px 22px var(--shadow-strong)}
+.kpi:hover{transform:translateY(-1px); box-shadow:0 8px 18px var(--shadow-strong)}
 .kpi:nth-child(1){animation-delay:.05s}.kpi:nth-child(2){animation-delay:.12s}
 .kpi:nth-child(3){animation-delay:.19s}.kpi:nth-child(4){animation-delay:.26s}
 .kpi:nth-child(5){animation-delay:.33s}.kpi:nth-child(6){animation-delay:.40s}
 @keyframes pop{to{opacity:1;transform:translateY(0)}}
-.kpi .label{font-size:12px; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:5px}
+.kpi .label{font-size:12px; color:var(--muted); margin-bottom:6px; display:flex; align-items:center; gap:5px}
 .kpi .dot{width:8px;height:8px;border-radius:50%}
-.kpi .value{font-size:22px; font-weight:700; color:var(--dark)}
+.kpi .value{font-size:26px; font-weight:800; color:var(--dark); line-height:1.15}
 .kpi .value.money::before{content:"¥"; font-size:14px; opacity:.6; margin-right:1px}
 /* ===== 工具条 ===== */
 .toolbar{
@@ -130,7 +132,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage.pinned .stage-head{background:linear-gradient(100deg,#7A4F08 0%,#A46D16 58%,#C79A52 100%)}
 .stage.pinned{order:-1}
 .stage-sum{font-size:13px; color:#fff; display:flex; gap:16px; flex-wrap:wrap; z-index:1}
-.stage-sum span{background:rgba(255,255,255,.14); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px)}
+.stage-sum span{background:rgba(255,255,255,.18); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px)}
 .stage-sum b{color:#FFE1A6; font-weight:700}
 .table-wrap{background:var(--card); border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 4px 14px var(--shadow)}
 /* 回款节点：区别于普通节点的配色 */
@@ -147,24 +149,29 @@ thead th{
 thead th:first-child{padding-left:22px}
 thead th.thmoney{text-align:right; padding-right:22px}
 thead th.thcenter{text-align:center}
+thead th:nth-child(2),tbody td:nth-child(2){min-width:62px}
+thead th:nth-child(8),tbody td:nth-child(8){min-width:104px}
 tbody td:first-child .cell{margin-left:12px}
 tbody td.money .cell{margin-right:12px}
 tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
 tbody tr{transition:background .2s}
 tbody tr:hover{background:var(--bg)}
 tbody tr:hover .cell{background:transparent}
+.budget-row{animation:rowIn .24s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
 .add-row-btn{width:100%;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:var(--budget-bg)}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
-  flex:1;
+  flex:1; box-shadow:inset 0 -1px rgba(199,154,82,.18); overflow-wrap:anywhere;
 }
-.cell:hover{background:var(--bg)}
+.cell:hover{background:var(--bg); border-color:rgba(199,154,82,.26)}
 .cell:focus{background:var(--card); border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.12)}
 .cell.saved{animation:flash .7s}
 @keyframes flash{0%{background:#C6EFCE}100%{background:transparent}}
+tbody td:nth-child(2) .cell,tbody td:nth-child(8) .cell,.tdstatus{white-space:nowrap}
 td.money .cell{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
 td.budget .cell{background:var(--budget-bg)}
 td.paid .cell{color:var(--green); font-weight:600}
@@ -227,15 +234,18 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 }
 .chart-card.in{opacity:1;transform:translateY(0) scale(1)}
 .chart-card:hover{
-  box-shadow:0 16px 34px var(--shadow-strong);transform:translateY(-8px) scale(1.025);
+  box-shadow:0 12px 24px var(--shadow-strong);transform:translateY(-3px) scale(1.01);
   border-color:rgba(199,154,82,.45);
 }
 .chart-card:hover::after{transform:translateX(120%)}
 .chart-card h3{font-size:15px;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;font-weight:700}
 .chart-card h3::before{content:"";width:5px;height:16px;background:var(--gold);border-radius:3px}
 .chart-card canvas{width:100%;display:block}
+.chart-donut canvas{max-height:240px}
 .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted);justify-content:center}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend-budget{background:var(--chart-budget)}
+.legend-paid{background:var(--chart-paid)}
 @media(prefers-reduced-motion:reduce){
   .chart-card,.chart-card::after{transition:none}
   .chart-card:hover{transform:none}
@@ -244,8 +254,10 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 .progress-label{font-size:12px;color:var(--muted);margin-top:5px;text-align:right}
 /* ===== 响应式 ===== */
 @media(max-width:900px){
-  .kpis{grid-template-columns:repeat(3,1fr)}
+  .kpis{grid-template-columns:repeat(2,1fr)}
   .charts{grid-template-columns:1fr}
+  .fab{left:14px;right:auto;width:44px;height:44px}
+  .fab .tip{left:54px;right:auto}
 }
 @media(max-width:600px){
   header{padding:24px 16px}
@@ -280,6 +292,10 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 @media(max-width:600px) and (hover:none){
   .kpi:active{transform:scale(.98)}
 }
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+  .kpi,.stage,.budget-row,header h1,header p{animation:none!important;opacity:1!important;transform:none!important}
+}
 .hidden{display:none!important}
 .footer{max-width:1280px;margin:30px auto 0;padding:0 24px;color:var(--muted);font-size:12px;text-align:center}
 </style>
@@ -312,17 +328,17 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 </div>
 
 <div class="charts">
-  <div class="chart-card">
+  <div class="chart-card chart-bar">
     <h3>各阶段 预算 vs 已付款</h3>
     <canvas id="barChart" height="300"></canvas>
     <div class="legend">
-      <span><i style="background:#C79A52"></i>预算款</span>
-      <span><i style="background:#376B55"></i>已付款</span>
+      <span><i class="legend-budget"></i>预算款</span>
+      <span><i class="legend-paid"></i>已付款</span>
     </div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card chart-donut">
     <h3>整体资金构成</h3>
-    <canvas id="donutChart" height="300"></canvas>
+    <canvas id="donutChart" height="240"></canvas>
     <div class="legend" id="donutLegend"></div>
   </div>
 </div>
@@ -378,6 +394,7 @@ let cloudUpdatedAt="", cloudSaveTimer=null, cloudSaving=false, applyingRemote=fa
 
 const fmt = n => (Number(n)||0).toLocaleString('zh-CN',{maximumFractionDigits:2});
 const toast = msg => {const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);};
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function cloudHeaders(){
   return {
@@ -508,6 +525,7 @@ function calcKPI(){
 // ====== 数字增量动画 ======
 function animateNumber(el, to, money){
   const from = el._cur || 0;
+  if(prefersReducedMotion()){el.textContent = money?fmt(to):to; el._cur=to; return;}
   if(from===to){el.textContent = money?fmt(to):to; el._cur=to; return;}
   const dur = 700, t0 = performance.now();
   const ease = t => 1-Math.pow(1-t,3);
@@ -523,14 +541,13 @@ function animateNumber(el, to, money){
 }
 
 const KPI_DEFS=[
-  {key:'budget',l:'总预算',c:'#C79A52',money:1},
-  {key:'paid',l:'已付款',c:'#376B55',money:1},
-  {key:'unpaid',l:'未付尾款',c:'#C95252',money:1},
-  {key:'remain',l:'预计剩余未付',c:'#214E3B',money:1},
-  {key:'done',l:'已完成节点',c:'#376B55',money:0},
-  {key:'todo',l:'未完成节点',c:'#C79A52',money:0},
+  {key:'budget',l:'总预算',c:'var(--chart-budget)',money:1},
+  {key:'paid',l:'已付款',c:'var(--chart-paid)',money:1},
+  {key:'unpaid',l:'未付尾款',c:'var(--red)',money:1},
+  {key:'remain',l:'预计剩余未付',c:'var(--dark)',money:1},
 ];
 let kpiBuilt=false;
+let lastKpiSignature='';
 function buildKPI(){
   document.getElementById('kpis').innerHTML = KPI_DEFS.map(c=>`
     <div class="kpi" style="--accent:${c.c}">
@@ -541,6 +558,9 @@ function buildKPI(){
 }
 function renderKPI(){
   const k=calcKPI();
+  const signature=JSON.stringify(k);
+  const changed=signature!==lastKpiSignature;
+  lastKpiSignature=signature;
   if(!kpiBuilt) buildKPI();
   KPI_DEFS.forEach(c=>{
     const el=document.querySelector(`.value[data-key="${c.key}"]`);
@@ -548,7 +568,7 @@ function renderKPI(){
   });
   const pct = k.done+k.todo ? Math.round(k.done/(k.done+k.todo)*100) : 0;
   setTimeout(()=>{document.getElementById('progFill').style.width=pct+'%';},200);
-  document.getElementById('progLabel').textContent=`节点完成进度 ${k.done}/${k.done+k.todo} · ${pct}%`;
+  document.getElementById('progLabel').textContent='节点完成进度';
   const achPct=document.getElementById('achPct');
   const achDone=document.getElementById('achDone');
   const achCurrent=document.getElementById('achCurrent');
@@ -556,7 +576,7 @@ function renderKPI(){
   if(achDone) achDone.textContent=`${k.done} / ${k.done+k.todo} 项`;
   if(achCurrent) achCurrent.textContent=currentStageName();
   const nc=document.getElementById('nodeCount'); if(nc)nc.textContent=k.done+k.todo;
-  drawCharts();
+  if(changed) drawCharts();
 }
 
 // ====== 表格渲染 ======
@@ -658,7 +678,7 @@ function renderStages(){
 
 // ====== 编辑与保存 ======
 function fireCompletionBurst(el){
-  if(!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(!el || prefersReducedMotion()) return;
   const rect=el.getBoundingClientRect();
   const colors=[cssVar('--gold')||'#C79A52',cssVar('--green')||'#376B55',cssVar('--red')||'#C95252','#ffffff'];
   for(let i=0;i<18;i++){
@@ -756,7 +776,7 @@ function observeStages(){
     if(e.isIntersecting){
       e.target.classList.add('in');
       // anime.js 交错进场：阶段头 + 行依次浮现
-      if(window.anime && !e.target._animated){
+      if(window.anime && !prefersReducedMotion() && !e.target._animated){
         e.target._animated=true;
         const rows=e.target.querySelectorAll('tbody tr');
         anime({targets:e.target.querySelector('.stage-head'),translateY:[16,0],opacity:[0,1],duration:500,easing:'easeOutCubic'});
@@ -862,9 +882,9 @@ function cssVar(name){
 }
 function drawCharts(){
   cancelAnimationFrame(chartAnim);
-  const t0=performance.now(), dur=900, ease=t=>1-Math.pow(1-t,3);
+  const t0=performance.now(), dur=prefersReducedMotion()?0:700, ease=t=>1-Math.pow(1-t,3);
   function frame(now){
-    const p=Math.min((now-t0)/dur,1), e=ease(p);
+    const p=dur ? Math.min((now-t0)/dur,1) : 1, e=ease(p);
     drawBar(e); drawDonut(e);
     if(p<1) chartAnim=requestAnimationFrame(frame);
   }
@@ -893,30 +913,42 @@ function drawBar(prog){
     ctx.fillText(d.name.length>7?d.name.slice(0,7):d.name, padL-10, cy);
     // budget bar
     const bw=chartW*(d.budget/max)*prog;
-    roundRect(ctx,padL,cy-bh-1,bw,bh,3); ctx.fillStyle=cssVar('--gold'); ctx.fill();
+    roundRect(ctx,padL,cy-bh-1,bw,bh,3); ctx.fillStyle=cssVar('--chart-budget'); ctx.fill();
+    ctx.strokeStyle=cssVar('--chart-budget'); ctx.lineWidth=1;
+    roundRect(ctx,padL,cy-bh-1,bw,bh,3); ctx.stroke();
     // paid bar
     const pw=chartW*(d.paid/max)*prog;
-    roundRect(ctx,padL,cy+1,pw,bh,3); ctx.fillStyle=cssVar('--green'); ctx.fill();
+    if(d.paid>0){
+      roundRect(ctx,padL,cy+1,pw,bh,3); ctx.fillStyle=cssVar('--chart-paid'); ctx.fill();
+    }else{
+      ctx.beginPath();
+      ctx.moveTo(padL,cy+1);
+      ctx.lineTo(padL+22,cy+1);
+      ctx.strokeStyle=cssVar('--chart-zero');
+      ctx.lineWidth=2;
+      ctx.stroke();
+    }
     // value labels (both bars)
     if(prog>0.9){
       ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font='10px sans-serif';
-      ctx.fillStyle=cssVar('--gold'); ctx.fillText('¥'+fmt(d.budget), padL+bw+5, cy-bh/2-1);
-      ctx.fillStyle=cssVar('--green'); ctx.fillText('¥'+fmt(d.paid), padL+pw+5, cy+bh/2+2);
+      ctx.fillStyle=cssVar('--chart-budget'); ctx.fillText('¥'+fmt(d.budget), padL+bw+5, cy-bh/2-1);
+      ctx.fillStyle=d.paid>0 ? cssVar('--chart-paid') : cssVar('--chart-zero');
+      ctx.fillText(d.paid>0 ? '¥'+fmt(d.paid) : '¥0', padL+(d.paid>0?pw:24)+5, cy+bh/2+2);
     }
     ctx.font='11px "PingFang SC",sans-serif';
   });
 }
 function drawDonut(prog){
   const cv=document.getElementById('donutChart'); if(!cv)return;
-  const {ctx,w,h}=setupCanvas(cv,300);
+  const {ctx,w,h}=setupCanvas(cv,240);
   ctx.clearRect(0,0,w,h);
   const k=calcKPI();
   const parts=[
-    {l:'已付款',v:k.paid,c:cssVar('--green')},
-    {l:'预计剩余未付',v:Math.max(k.remain,0),c:cssVar('--gold')},
+    {l:'已付款',v:k.paid,c:cssVar('--chart-paid')},
+    {l:'预计剩余未付',v:Math.max(k.remain,0),c:cssVar('--chart-budget')},
   ];
   const total=parts.reduce((s,p)=>s+p.v,0)||1;
-  const cx=w/2, cy=h/2-6, R=Math.min(w,h)/2-40, r=R*0.58;
+  const cx=w/2, cy=h/2-4, R=Math.min(w,h)/2-34, r=R*0.58;
   let start=-Math.PI/2;
   parts.forEach(pt=>{
     const ang=(pt.v/total)*Math.PI*2*prog;
