@@ -1,0 +1,11 @@
+{
+  "name": "hz-renovation-budget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HZ 装修预算表静态网站",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "check": "node scripts/check-site.mjs",
+    "deploy:pages": "npm run check && git push origin main && git push origin main:gh-pages"
+  }
+}

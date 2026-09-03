@@ -24,6 +24,16 @@
 
 **运行方式**：直接双击 `src/index.html`，用任意现代浏览器打开即可。所有数据、样式、脚本、动效库（anime.js）全部内联，不依赖任何 CDN 或后端。
 
+也可以使用项目内置的零依赖开发命令：
+
+```bash
+npm run dev          # 启动 http://127.0.0.1:4173/
+npm run check        # 校验页面入口、内部链接与内联脚本
+npm run deploy:pages # 校验后推送 main，并同步发布到 gh-pages
+```
+
+线上地址：[https://hz-lxt.github.io/furnish/](https://hz-lxt.github.io/furnish/)
+
 ---
 
 ## 2. 这是什么
