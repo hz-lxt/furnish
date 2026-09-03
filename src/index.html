@@ -15,6 +15,7 @@
 <style>
 :root{
   --dark:#214E3B; --green:#376B55; --gold:#C79A52; --red:#C95252;
+  --saving:#2F6E8F; --saving-soft:#E7F3F7;
   --bg:#F4F7F5; --card:#FFFFFF; --line:#E3EAE5; --ink:#24312B; --muted:#6D7771;
   --paid-bg:#E5F3E9; --budget-bg:#FBF7EF; --unpaid-bg:#FCE8E6;
   --body-bg:linear-gradient(135deg,#EDF4EF 0%,#F4F7F5 100%);
@@ -24,6 +25,7 @@
 }
 :root[data-theme="dark"]{
   --dark:#D9EFE4; --green:#A7D8BD; --gold:#D6A95E; --red:#E17870;
+  --saving:#82C4DE; --saving-soft:#17313A;
   --bg:#111815; --card:#18231E; --line:#2B3A33; --ink:#EDF5F0; --muted:#A9B9B0;
   --paid-bg:#1D3429; --budget-bg:#302817; --unpaid-bg:#3A2221;
   --body-bg:linear-gradient(135deg,#0E1512 0%,#16211C 100%);
@@ -50,6 +52,22 @@ header::after{
 }
 header h1{font-size:26px; font-weight:700; letter-spacing:1px; animation:slideDown .8s cubic-bezier(.2,.8,.2,1)}
 header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:slideDown .8s .1s backwards}
+.countdown{
+  display:inline-flex;align-items:center;gap:10px;margin-top:12px;padding:8px 12px;border-radius:999px;
+  color:#fff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-size:13px;font-weight:700;
+  box-shadow:inset 0 1px rgba(255,255,255,.2);animation:slideDown .8s .18s backwards;
+}
+.countdown::before{content:"⌂";color:#FFE1A6;font-size:15px}
+.countdown-title{color:rgba(255,255,255,.82);font-weight:600}
+.countdown-time{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.countdown-unit{display:inline-flex;align-items:baseline;gap:3px}
+.countdown-num{
+  min-width:2.8ch;padding:2px 7px;border-radius:7px;background:rgba(255,255,255,.18);
+  color:#FFE1A6;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px rgba(255,255,255,.16);
+}
+.countdown-unit:first-child .countdown-num{min-width:3.6ch}
+.countdown-label{font-size:11px;color:rgba(255,255,255,.72);font-weight:600}
 @keyframes slideDown{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
 /* ===== KPI 卡片 ===== */
 .kpis{
@@ -87,6 +105,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .btn{
   padding:11px 18px; border:none; border-radius:10px; cursor:pointer; font-size:14px;
   font-weight:600; transition:transform .2s, box-shadow .2s, background .2s, border-color .2s; font-family:inherit;
+  text-decoration:none; display:inline-flex; align-items:center; justify-content:center;
 }
 .btn-primary{background:var(--primary-bg); color:var(--primary-fg)}
 .btn-primary:hover{background:var(--header-end); transform:translateY(-1px); box-shadow:0 6px 16px rgba(33,78,59,.25)}
@@ -140,6 +159,10 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage.rebate thead th{background:#8A6A1C}
 .stage.rebate td.rebate .cell{color:#A97112; font-weight:700}
 .stage.rebate .stage-sum b{color:#FFF1D0}
+.stage.saving .stage-head{background:linear-gradient(100deg,#17495F 0%,#2F6E8F 58%,#6CB1C7 100%)}
+.stage.saving thead th{background:#245C76}
+.stage.saving td.saving .cell{background:var(--saving-soft);color:var(--saving);font-weight:800}
+.stage.saving .stage-sum b{color:#D8F6FF}
 .stage.collapsed .table-wrap{max-height:0!important; opacity:0; border:none}
 table{width:100%; border-collapse:collapse; font-size:13px}
 thead th{
@@ -168,6 +191,26 @@ tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
   flex:1; box-shadow:inset 0 -1px rgba(199,154,82,.18); overflow-wrap:anywhere;
+}
+.date-picker{
+  position:relative;display:block;margin:2px;min-width:138px;border-radius:8px;
+}
+.date-picker .date-input{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;
+}
+.date-display{
+  display:flex;align-items:center;gap:7px;min-height:38px;padding:9px 11px;border:1px solid transparent;border-radius:8px;
+  background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(199,154,82,.1));color:var(--ink);
+  font-weight:700;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;box-shadow:inset 0 -1px rgba(199,154,82,.16);
+  transition:.18s;
+}
+.date-display::before{
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(199,154,82,.16);
+}
+.date-picker.empty .date-display{color:var(--muted);font-weight:600}
+.date-picker.empty .date-display::before{background:var(--muted);box-shadow:0 0 0 4px rgba(109,119,113,.12)}
+.date-picker:hover .date-display,.date-picker:focus-within .date-display{
+  border-color:rgba(199,154,82,.42);background:var(--card);box-shadow:0 0 0 3px rgba(199,154,82,.12),inset 0 -1px rgba(199,154,82,.18);
 }
 .cell:hover{background:var(--bg); border-color:rgba(199,154,82,.26)}
 .cell:focus{background:var(--card); border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,154,82,.12)}
@@ -281,12 +324,14 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   /* 表格横向滚动，保留所有列 */
   .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .stage:not(.collapsed) .table-wrap{max-height:none}
-  table{min-width:680px}
+  table{min-width:720px}
   .stage-head{padding:12px 16px;flex-wrap:wrap;gap:8px}
   .stage-head h2{font-size:15px}
   .stage-sum{font-size:11px;gap:6px}
   .stage-sum span{padding:2px 8px}
   .cell{font-size:12px;padding:9px 8px;min-height:40px}
+  .countdown{align-items:flex-start;border-radius:12px;flex-direction:column;gap:6px}
+  .countdown-time{flex-wrap:wrap}
   thead th{font-size:11px;padding:10px 8px}
   thead th:first-child{padding-left:14px}
   /* 触摸友好：状态徽章与按钮更大点击区 */
@@ -309,6 +354,7 @@ td.unpaid .cell{color:var(--red); font-weight:600}
 <header>
   <h1>雍贤山庐 7-1004 装修预算总表</h1>
   <p>127㎡ 毛坯住宅</p>
+  <div class="countdown" id="moveCountdown">距离搬进新家还有--天--小时--分钟--秒</div>
 </header>
 
 <div class="kpis" id="kpis"></div>
@@ -354,6 +400,7 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   <span class="chip active" data-f="all">全部</span>
   <span class="chip" data-f="done">已完成</span>
   <span class="chip" data-f="todo">未完成</span>
+  <a class="btn btn-ghost" href="timeline.html">装修时间线</a>
   <button class="btn btn-ghost" id="expandAll">展开/收起全部</button>
   <button class="btn btn-ghost" id="themeToggle" title="切换明暗模式">深色模式</button>
   <button class="btn btn-ghost hidden" id="exportBtn">⬇ 导出数据</button>
@@ -388,10 +435,12 @@ const SUPABASE_URL = "https://rqkaovjfqcuvscehdmyx.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxa2FvdmpmcWN1dnNjZWhkbXl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MTQyNTIsImV4cCI6MjA5OTA5MDI1Mn0.zqAcO99OrKyYVQewnDFEVV6Ol43F_Vb6Npm7WfDdyJ4";
 const CLOUD_DOC_ID = "main";
 const EDIT_PASS_KEY = "yxsl_budget_edit_password_v2";
+const MOVE_IN_TARGET = new Date("2027-01-01T00:00:00+08:00").getTime();
+const SAVING_STAGE = {stage:"特别省下的钱",kind:"savings",noStat:true,items:[]};
 
 function loadData(){
-  try{const s=localStorage.getItem(LS_KEY); if(s) return JSON.parse(s);}catch(e){}
-  return JSON.parse(JSON.stringify(SEED));
+  try{const s=localStorage.getItem(LS_KEY); if(s) return normalizeData(JSON.parse(s));}catch(e){}
+  return normalizeData(JSON.parse(JSON.stringify(SEED)));
 }
 let DATA = loadData();
 let filter="all", keyword="";
@@ -400,6 +449,23 @@ let cloudUpdatedAt="", cloudSaveTimer=null, cloudSaving=false, applyingRemote=fa
 const fmt = n => (Number(n)||0).toLocaleString('zh-CN',{maximumFractionDigits:2});
 const toast = msg => {const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);};
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+const dateValue = v => (/^\d{4}-\d{2}-\d{2}$/.test(String(v||'')) ? String(v) : '');
+function formatDateLabel(v){
+  const value=dateValue(v);
+  if(!value) return '选择日期';
+  const [year,month,day]=value.split('-');
+  return `${year}年${Number(month)}月${Number(day)}日`;
+}
+
+function normalizeData(data){
+  const arr=Array.isArray(data)?data:[];
+  arr.forEach(s=>s.items=(Array.isArray(s.items)?s.items:[]).map(it=>({...it,unpaid:0})));
+  if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
+    arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
+  }
+  return arr;
+}
 
 function cloudHeaders(){
   return {
@@ -417,7 +483,7 @@ async function fetchCloudDoc(){
 }
 function applyCloudDoc(doc, quiet){
   if(!doc || !Array.isArray(doc.data)) return;
-  DATA = doc.data;
+  DATA = normalizeData(doc.data);
   cloudUpdatedAt = doc.updated_at || cloudUpdatedAt;
   localStorage.setItem(LS_KEY, JSON.stringify(DATA));
   renderKPI(); renderStages();
@@ -520,12 +586,14 @@ async function saveCloudData(){
 
 // ====== KPI 计算 ======
 function calcKPI(){
-  let budget=0,paid=0,unpaid=0,done=0,todo=0;
-  DATA.forEach(s=>{ if(s.noStat) return; s.items.forEach(it=>{
-    budget+=Number(it.budget)||0; paid+=Number(it.paid)||0; unpaid+=Number(it.unpaid)||0;
+  let budget=0,paid=0,saved=0,done=0,todo=0;
+  DATA.forEach(s=>{
+    if(s.kind==="savings"){s.items.forEach(it=>saved+=Number(it.saved)||0); return;}
+    if(s.noStat) return; s.items.forEach(it=>{
+    budget+=Number(it.budget)||0; paid+=Number(it.paid)||0;
     if(it.status==='已完成')done++; else if(it.status==='未完成')todo++;
   });});
-  return {budget,paid,unpaid,remain:budget-paid,done,todo};
+  return {budget,paid,saved,remain:budget-paid,done,todo};
 }
 // ====== 数字增量动画 ======
 function animateNumber(el, to, money){
@@ -548,8 +616,8 @@ function animateNumber(el, to, money){
 const KPI_DEFS=[
   {key:'budget',l:'总预算',c:'var(--chart-budget)',money:1},
   {key:'paid',l:'已付款',c:'var(--chart-paid)',money:1},
-  {key:'unpaid',l:'未付尾款',c:'var(--red)',money:1},
-  {key:'remain',l:'预计剩余未付',c:'var(--dark)',money:1},
+  {key:'remain',l:'待安排资金',c:'var(--dark)',money:1},
+  {key:'saved',l:'特别省下',c:'var(--saving)',money:1},
 ];
 let kpiBuilt=false;
 let lastKpiSignature='';
@@ -588,27 +656,30 @@ function renderKPI(){
 const COLS=[
   {k:'cat',t:'类别'},{k:'space',t:'空间'},{k:'name',t:'项目名称'},{k:'brand',t:'品牌/规格'},
   {k:'budget',t:'预算款',cls:'money budget'},{k:'paid',t:'已付款',cls:'money paid'},
-  {k:'unpaid',t:'未付尾款',cls:'money unpaid'},{k:'date',t:'日期'},
-  {k:'status',t:'状态'},{k:'note',t:'备注'}
+  {k:'date',t:'日期'},{k:'status',t:'状态'},{k:'note',t:'备注'}
 ];
-// 回款节点专属列：不显示预算/未付/状态，只展示回收款
+// 回款节点专属列：不显示预算/状态，只展示回收款
 const REBATE_COLS=[
   {k:'name',t:'回款项目'},{k:'space',t:'空间'},
   {k:'paid',t:'回收金额',cls:'money rebate'},{k:'date',t:'日期'},{k:'note',t:'备注'}
+];
+const SAVING_COLS=[
+  {k:'name',t:'省钱项目'},{k:'space',t:'空间'},
+  {k:'saved',t:'省下金额',cls:'money saving'},{k:'date',t:'日期'},{k:'note',t:'备注'}
 ];
 function match(it){
   if(filter==='done'&&it.status!=='已完成')return false;
   if(filter==='todo'&&it.status!=='未完成')return false;
   if(keyword){
-    const hay=(it.cat+it.space+it.name+it.brand+it.note).toLowerCase();
+    const hay=(it.cat+it.space+it.name+it.brand+it.note+it.saved).toLowerCase();
     if(!hay.includes(keyword.toLowerCase()))return false;
   }
   return true;
 }
 function stageSum(s){
-  let b=0,p=0,u=0;
-  s.items.forEach(it=>{b+=Number(it.budget)||0;p+=Number(it.paid)||0;u+=Number(it.unpaid)||0;});
-  return {b,p,u};
+  let b=0,p=0,saved=0;
+  s.items.forEach(it=>{b+=Number(it.budget)||0;p+=Number(it.paid)||0;saved+=Number(it.saved)||0;});
+  return {b,p,saved};
 }
 function stageOrder(s){
   const m=String(s.stage||'').match(/^(\d+)/);
@@ -622,11 +693,12 @@ function orderedStageEntries(){
 }
 function currentStageName(){
   const pinned=orderedStageEntries().find(({s})=>s.pinned);
-  const active=pinned || orderedStageEntries().find(({s})=>!s.noStat && s.items.some(it=>it.status!=='已完成'));
+  const active=pinned || orderedStageEntries().find(({s})=>!s.noStat && s.kind!=="savings" && s.items.some(it=>it.status!=='已完成'));
   if(!active) return '全部完成';
   return active.s.stage.replace(/^\d+\s*/,'');
 }
 function emptyItemForStage(s){
+  if(s.kind==="savings") return {cat:"省钱",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,saved:0,date:"",status:"已完成",note:""};
   if(s.noStat) return {cat:"回款",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"已完成",note:""};
   return {cat:"",space:"",name:"",brand:"",budget:0,paid:0,unpaid:0,date:"",status:"未完成",note:""};
 }
@@ -636,9 +708,13 @@ function rowHtml(it,si,ii,cols){
       const done=it.status==='已完成';
       return `<td class="tdstatus" style="text-align:center"><span class="status-badge ${done?'done':'todo'}" data-si="${si}" data-ii="${ii}">${it.status||'未完成'}</span></td>`;
     }
+    if(col.k==='date'){
+      const value=dateValue(it.date);
+      return `<td><label class="date-picker ${value?'':'empty'}"><input type="date" class="date-input" data-si="${si}" data-ii="${ii}" data-k="date" value="${escapeHtml(value)}"><span class="date-display">${escapeHtml(formatDateLabel(value))}</span></label></td>`;
+    }
     const isMoney=col.cls&&col.cls.includes('money');
     const val=isMoney?fmt(it[col.k]):(it[col.k]||'');
-    return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${val}</div></td>`;
+    return `<td class="${col.cls||''}"><div class="cell" contenteditable="true" data-si="${si}" data-ii="${ii}" data-k="${col.k}" data-money="${isMoney?1:0}">${escapeHtml(val)}</div></td>`;
   }).join('');
   return `<tr class="budget-row" data-si="${si}" data-ii="${ii}">${tds}<td class="tdactions"><button class="btn btn-ghost btn-mini delete-row-btn" data-si="${si}" data-ii="${ii}" title="删除条目">删除</button></td></tr>`;
 }
@@ -647,18 +723,21 @@ function renderStages(){
   orderedStageEntries().forEach(({s,si})=>{
     const visible=s.items.filter(match);
     if(!visible.length && (keyword||filter!=='all')) return;
-    const isRebate=!!s.noStat;
-    const cols=isRebate?REBATE_COLS:COLS;
+    const isSaving=s.kind==="savings";
+    const isRebate=!!s.noStat&&!isSaving;
+    const cols=isSaving?SAVING_COLS:(isRebate?REBATE_COLS:COLS);
     const sum=stageSum(s);
-    const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':'')+(s.pinned?' pinned':''); el.dataset.si=si;
+    const el=document.createElement('div'); el.className='stage'+(isRebate?' rebate':'')+(isSaving?' saving':'')+(s.pinned?' pinned':''); el.dataset.si=si;
     let rows = s.items.map((it,ii)=>match(it)?rowHtml(it,si,ii,cols):'').join('');
-    const sumHtml = isRebate
-      ? `<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`
-      : `<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
+    const sumHtml = isSaving
+      ? `<span>省下合计 <b>¥${fmt(sum.saved)}</b></span><span>${s.items.length} 项</span>`
+      : (isRebate
+        ? `<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`
+        : `<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>${s.items.length} 项</span>`);
     const pinHtml = s.pinned ? `<span class="stage-pin">正在进行</span>` : '';
     el.innerHTML=`
       <div class="stage-head">
-        <h2><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isRebate?'♻ ':''}${s.stage}</span></span></h2>
+        <h2><span class="caret">▾</span><span class="stage-title">${pinHtml}<span>${isSaving?'✦ ':(isRebate?'♻ ':'')}${s.stage}</span></span></h2>
         <div class="stage-actions">
           <div class="stage-sum">${sumHtml}</div>
           <button class="btn btn-ghost btn-mini pin-stage" data-si="${si}">${s.pinned?'取消置顶':'置顶节点'}</button>
@@ -737,6 +816,32 @@ function bindStatusBadge(b){
     renderKPI(); toast('状态已更新 → '+nv);
   });
 }
+function bindDateInput(input){
+  input.addEventListener('change',function(){
+    const {si,ii,k}=this.dataset;
+    const old=DATA[si].items[ii][k]||'';
+    const v=this.value;
+    if(String(old)===String(v)) return;
+    if(!ensureEditAllowed()){
+      this.value=dateValue(old);
+      updateDatePicker(this);
+      return;
+    }
+    DATA[si].items[ii][k]=v;
+    saveData(); renderKPI(); refreshStageSum(si);
+    updateDatePicker(this);
+    const display=this.closest('.date-picker')?.querySelector('.date-display');
+    display?.classList.add('saved'); setTimeout(()=>display?.classList.remove('saved'),700);
+    toast('日期已保存 ✓');
+  });
+}
+function updateDatePicker(input){
+  const wrap=input.closest('.date-picker');
+  const display=wrap&&wrap.querySelector('.date-display');
+  if(!wrap || !display) return;
+  wrap.classList.toggle('empty',!input.value);
+  display.textContent=formatDateLabel(input.value);
+}
 function reindexStageRows(si){
   document.querySelectorAll(`.budget-row[data-si="${si}"]`).forEach(row=>{
     const ii=Number(row.dataset.ii);
@@ -768,7 +873,8 @@ function bindDeleteButton(btn){
   });
 }
 function bindRowControls(row){
-  row.querySelectorAll('.cell').forEach(bindCell);
+  row.querySelectorAll('.cell[contenteditable="true"]').forEach(bindCell);
+  row.querySelectorAll('.date-input').forEach(bindDateInput);
   row.querySelectorAll('.status-badge').forEach(bindStatusBadge);
   row.querySelectorAll('.delete-row-btn').forEach(bindDeleteButton);
 }
@@ -777,7 +883,7 @@ function appendRowToStage(si,item,ii){
   const stage=document.querySelector(`.stage[data-si="${si}"]`);
   const tbody=stage&&stage.querySelector('tbody');
   if(!tbody) return false;
-  const cols=s.noStat?REBATE_COLS:COLS;
+  const cols=s.kind==="savings"?SAVING_COLS:(s.noStat?REBATE_COLS:COLS);
   tbody.insertAdjacentHTML('beforeend',rowHtml(item,si,ii,cols));
   const row=tbody.lastElementChild;
   bindRowControls(row);
@@ -818,8 +924,9 @@ function refreshStageSum(si){
   const s=DATA[si],sum=stageSum(s);
   const el=document.querySelector(`.stage[data-si="${si}"] .stage-sum`);
   if(!el)return;
-  if(s.noStat) el.innerHTML=`<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`;
-  else el.innerHTML=`<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>未付 ¥${fmt(sum.u)}</span><span>${s.items.length} 项</span>`;
+  if(s.kind==="savings") el.innerHTML=`<span>省下合计 <b>¥${fmt(sum.saved)}</b></span><span>${s.items.length} 项</span>`;
+  else if(s.noStat) el.innerHTML=`<span>回收合计 <b>¥${fmt(sum.p)}</b></span><span>${s.items.length} 项</span>`;
+  else el.innerHTML=`<span>预算 <b>¥${fmt(sum.b)}</b></span><span>已付 ¥${fmt(sum.p)}</span><span>${s.items.length} 项</span>`;
 }
 
 // ====== 折叠 / 滚动动画 ======
@@ -868,7 +975,7 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 document.getElementById('reset').addEventListener('click',()=>{
   if(confirm('确定恢复到初始数据？你的所有本地修改将被清除。')){
     if(!ensureEditAllowed()) return;
-    localStorage.removeItem(LS_KEY); DATA=JSON.parse(JSON.stringify(SEED));
+    localStorage.removeItem(LS_KEY); DATA=normalizeData(JSON.parse(JSON.stringify(SEED)));
     saveData(); renderKPI(); renderStages(); toast('已恢复初始数据');
   }
 });
@@ -894,7 +1001,7 @@ document.getElementById('importFile').addEventListener('change',function(){
       if(!Array.isArray(arr)||!arr[0]||!('items' in arr[0])) throw new Error('格式不符');
       if(confirm('确定用导入的数据覆盖当前内容？建议先导出备份。')){
         if(!ensureEditAllowed()) return;
-        DATA=arr; saveData(); renderKPI(); renderStages(); toast('导入成功 ✓');
+        DATA=normalizeData(arr); saveData(); renderKPI(); renderStages(); toast('导入成功 ✓');
       }
     }catch(err){ alert('导入失败：文件不是有效的预算数据 JSON。\n'+err.message); }
     this.value='';
@@ -918,6 +1025,24 @@ startBtn.addEventListener('click',()=>{
     if(window.anime){anime({targets:first,scale:[1.02,1],duration:600,easing:'easeOutElastic(1,.6)'});}
   }
 });
+function updateMoveCountdown(){
+  const el=document.getElementById('moveCountdown');
+  if(!el) return;
+  let diff=Math.max(0,MOVE_IN_TARGET-Date.now());
+  const day=86400000,hour=3600000,minute=60000;
+  const d=Math.floor(diff/day); diff-=d*day;
+  const h=Math.floor(diff/hour); diff-=h*hour;
+  const m=Math.floor(diff/minute); diff-=m*minute;
+  const s=Math.floor(diff/1000);
+  el.innerHTML=`<span class="countdown-title">距离搬进新家还有</span><span class="countdown-time">
+    <span class="countdown-unit"><span class="countdown-num">${d}</span><span class="countdown-label">天</span></span>
+    <span class="countdown-unit"><span class="countdown-num">${String(h).padStart(2,'0')}</span><span class="countdown-label">时</span></span>
+    <span class="countdown-unit"><span class="countdown-num">${String(m).padStart(2,'0')}</span><span class="countdown-label">分</span></span>
+    <span class="countdown-unit"><span class="countdown-num">${String(s).padStart(2,'0')}</span><span class="countdown-label">秒</span></span>
+  </span>`;
+}
+updateMoveCountdown();
+setInterval(updateMoveCountdown,1000);
 
 // ====== 图表（纯 Canvas 自绘）======
 function setupCanvas(cv, cssH){
@@ -943,7 +1068,7 @@ function drawCharts(){
   chartAnim=requestAnimationFrame(frame);
 }
 function stageData(){
-  return DATA.filter(s=>s.items.length && !s.noStat).map(s=>{
+  return DATA.filter(s=>s.items.length && !s.noStat && s.kind!=="savings").map(s=>{
     let b=0,pd=0; s.items.forEach(it=>{b+=Number(it.budget)||0;pd+=Number(it.paid)||0;});
     return {name:s.stage.replace(/^\d+\s*/,''), budget:b, paid:pd};
   }).filter(d=>d.budget>0||d.paid>0);
@@ -997,7 +1122,7 @@ function drawDonut(prog){
   const k=calcKPI();
   const parts=[
     {l:'已付款',v:k.paid,c:cssVar('--chart-paid')},
-    {l:'预计剩余未付',v:Math.max(k.remain,0),c:cssVar('--chart-budget')},
+    {l:'待安排资金',v:Math.max(k.remain,0),c:cssVar('--chart-budget')},
   ];
   const total=parts.reduce((s,p)=>s+p.v,0)||1;
   const cx=w/2, cy=h/2-4, R=Math.min(w,h)/2-34, r=R*0.58;

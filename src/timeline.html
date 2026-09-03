@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雍贤山庐装修时间线</title>
+<script>
+(function(){
+  try{
+    const theme=localStorage.getItem('yxsl_budget_theme');
+    if(theme==='dark') document.documentElement.dataset.theme='dark';
+  }catch(e){}
+})();
+</script>
+<style>
+:root{
+  --dark:#214E3B;--green:#376B55;--gold:#C79A52;--red:#C95252;--blue:#2F6E8F;
+  --bg:#F4F7F5;--card:rgba(255,255,255,.62);--line:rgba(33,78,59,.14);--ink:#24312B;--muted:#68756F;
+  --body-bg:radial-gradient(circle at 20% 0%,rgba(199,154,82,.16),transparent 32%),linear-gradient(135deg,#EDF4EF 0%,#F4F7F5 100%);
+  --shadow:rgba(33,78,59,.12);--header-start:#214E3B;--header-end:#376B55;
+}
+:root[data-theme="dark"]{
+  --dark:#D9EFE4;--green:#A7D8BD;--gold:#D6A95E;--red:#E17870;--blue:#82C4DE;
+  --bg:#111815;--card:rgba(24,35,30,.66);--line:rgba(255,255,255,.1);--ink:#EDF5F0;--muted:#A9B9B0;
+  --body-bg:radial-gradient(circle at 20% 0%,rgba(214,169,94,.14),transparent 34%),linear-gradient(135deg,#0E1512 0%,#16211C 100%);
+  --shadow:rgba(0,0,0,.34);--header-start:#14221C;--header-end:#203A2F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;background:var(--body-bg);color:var(--ink);line-height:1.55;min-height:100vh;padding-bottom:64px}
+.topbar{
+  position:sticky;top:0;z-index:20;background:rgba(244,247,245,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+}
+:root[data-theme="dark"] .topbar{background:rgba(17,24,21,.72)}
+.top-inner{max-width:1120px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--dark)}
+.brand-mark{width:10px;height:28px;border-radius:999px;background:linear-gradient(var(--gold),var(--blue));box-shadow:0 8px 18px rgba(199,154,82,.28)}
+.nav-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--dark);border-radius:10px;padding:9px 14px;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer;transition:.25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px var(--shadow);border-color:rgba(199,154,82,.5)}
+.hero{max-width:1120px;margin:0 auto;padding:34px 20px 18px}
+.hero h1{font-size:34px;line-height:1.15;color:var(--dark);letter-spacing:0;margin-bottom:10px}
+.hero p{color:var(--muted);font-size:14px;max-width:680px}
+.countdown{
+  display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:10px 12px;border-radius:12px;
+  background:var(--card);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:0 12px 28px var(--shadow),inset 0 1px rgba(255,255,255,.32);
+}
+.countdown-title{font-size:13px;color:var(--muted);font-weight:700}
+.countdown-time{display:flex;gap:7px;flex-wrap:wrap}
+.countdown-unit{display:flex;align-items:baseline;gap:3px}
+.countdown-num{min-width:2.8ch;text-align:center;border-radius:8px;padding:3px 8px;background:linear-gradient(135deg,rgba(199,154,82,.16),rgba(47,110,143,.12));color:var(--dark);font-weight:900;font-variant-numeric:tabular-nums}
+.countdown-unit:first-child .countdown-num{min-width:3.8ch}
+.countdown-label{font-size:11px;color:var(--muted);font-weight:700}
+.timeline-wrap{max-width:1120px;margin:0 auto;padding:16px 20px 44px;position:relative}
+.timeline{position:relative;display:grid;gap:22px}
+.timeline::before{
+  content:"";position:absolute;left:50%;top:8px;bottom:8px;width:2px;transform:translateX(-50%);
+  background:linear-gradient(transparent,var(--gold),var(--blue),transparent);
+}
+.milestone{display:grid;grid-template-columns:1fr 72px 1fr;align-items:center;opacity:0;transform:translateY(28px);transition:.6s cubic-bezier(.2,.8,.2,1)}
+.milestone.in{opacity:1;transform:translateY(0)}
+.milestone:nth-child(odd) .panel{grid-column:1}
+.milestone:nth-child(even) .panel{grid-column:3}
+.rail{grid-column:2;grid-row:1;display:flex;justify-content:center;position:relative;z-index:2}
+.node{
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:22px;
+  background:linear-gradient(135deg,var(--green),var(--blue));border:3px solid rgba(255,255,255,.72);
+  box-shadow:0 12px 26px var(--shadow),0 0 0 7px rgba(199,154,82,.12);
+}
+.milestone.current .node{background:linear-gradient(135deg,var(--gold),var(--green));animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 12px 26px var(--shadow),0 0 0 14px rgba(199,154,82,.18)}}
+.panel{
+  position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:8px;
+  backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%);
+  box-shadow:0 12px 30px var(--shadow),inset 0 1px rgba(255,255,255,.28);padding:18px;transition:.3s cubic-bezier(.2,.8,.2,1);
+}
+.panel::after{
+  content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.22),transparent 65%);
+  transform:translateX(-120%);transition:.75s cubic-bezier(.2,.8,.2,1);
+}
+.panel:hover{transform:translateY(-6px) scale(1.018);box-shadow:0 20px 42px var(--shadow),inset 0 1px rgba(255,255,255,.42);border-color:rgba(199,154,82,.46)}
+.panel:hover::after{transform:translateX(120%)}
+.meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.date{font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:0;white-space:nowrap}
+.state{font-size:12px;border-radius:999px;padding:3px 9px;background:rgba(55,107,85,.12);color:var(--green);font-weight:800}
+.milestone.current .state{background:rgba(199,154,82,.18);color:var(--gold)}
+.panel h2{font-size:20px;color:var(--dark);letter-spacing:0;margin-bottom:7px}
+.panel p{font-size:13px;color:var(--muted);margin-bottom:13px}
+.subtasks{display:flex;gap:8px;flex-wrap:wrap}
+.subtasks span{border:1px solid var(--line);background:rgba(255,255,255,.32);color:var(--ink);border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
+:root[data-theme="dark"] .subtasks span{background:rgba(255,255,255,.06)}
+@media(max-width:760px){
+  .hero h1{font-size:26px}
+  .timeline::before{left:26px}
+  .milestone{grid-template-columns:52px 1fr;gap:10px;align-items:start}
+  .milestone:nth-child(odd) .panel,.milestone:nth-child(even) .panel{grid-column:2}
+  .rail{grid-column:1}
+  .node{width:44px;height:44px;font-size:19px}
+  .countdown{align-items:flex-start;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important;scroll-behavior:auto!important}
+  .milestone{opacity:1;transform:none}
+  .panel:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <div class="top-inner">
+    <div class="brand"><span class="brand-mark"></span><span>装修时间线</span></div>
+    <div class="nav-actions">
+      <a class="btn" href="index.html">返回预算表</a>
+      <button class="btn" id="themeToggle">深色模式</button>
+    </div>
+  </div>
+</nav>
+<main>
+  <section class="hero">
+    <h1>从毛坯到新家，每一步都看得见</h1>
+    <p>大节点负责把控阶段，小节点记录关键动作。当前推进节点会高亮，滚动时节点逐步浮入。</p>
+    <div class="countdown" id="moveCountdown"></div>
+  </section>
+  <section class="timeline-wrap">
+    <div class="timeline" id="timeline"></div>
+  </section>
+</main>
+<script>
+const MOVE_IN_TARGET=new Date("2027-01-01T00:00:00+08:00").getTime();
+const ITEMS=[
+  {date:"2026年4月",icon:"钥",title:"房屋交付前",state:"已完成",text:"验房、设计、物业手续先落地，预算表从这里开始。",tasks:["监理验房","平面图","物业费用","维修基金"]},
+  {date:"2026年5月",icon:"拆",title:"开工准备与拆改",state:"已完成",text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。",tasks:["工长服务","封窗","砸墙清运","砌墙"]},
+  {date:"2026年6月",icon:"电",title:"水电与隐蔽工程",state:"已完成",text:"隐蔽工程决定后面的稳定性，水电材料和开孔一起核对。",tasks:["水电人工","水电材料","打孔","验收留档"]},
+  {date:"2026年7月",icon:"水",title:"防水与瓦工瓷砖",state:"当前推进",text:"防水、瓦工、瓷砖进入硬装关键段，付款与验收需要盯紧。",tasks:["瓷砖定金","瓦工人工","瓷砖尾款","包立管"]},
+  {date:"2026年8月",icon:"木",title:"木工与吊顶",state:"待推进",text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。",tasks:["客餐厅吊顶","木工人工","木工辅料","基层"]},
+  {date:"2026年9月",icon:"漆",title:"墙面与油漆",state:"待推进",text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。",tasks:["基层处理","油工人工","油工辅料","油漆"]},
+  {date:"2026年10-11月",icon:"装",title:"主材与安装",state:"待推进",text:"门、卫浴、灯具、开关面板集中安装，预算波动会比较明显。",tasks:["室内门","水槽马桶","灯具","开关面板"]},
+  {date:"2026年11-12月",icon:"家",title:"家具软装与家电",state:"待推进",text:"从功能完成走向入住质感，家具、家电、窗帘一起补齐。",tasks:["家具软装","中央空调","厨电","智能家居"]},
+  {date:"2026年12月",icon:"净",title:"保洁验收",state:"待推进",text:"开荒、验收、问题修补，给入住前最后一轮整理留时间。",tasks:["开荒保洁","垃圾清运","修补清单","入住检查"]},
+  {date:"2027年1月",icon:"住",title:"搬进新家",state:"目标",text:"把账、物、空间一起收束，正式进入新家的日常。",tasks:["结算","备用金","入住采购","搬家"]}
+];
+function updateThemeButton(){
+  const btn=document.getElementById('themeToggle');
+  btn.textContent=document.documentElement.dataset.theme==='dark'?'浅色模式':'深色模式';
+}
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const dark=document.documentElement.dataset.theme!=='dark';
+  document.documentElement.dataset.theme=dark?'dark':'';
+  try{localStorage.setItem('yxsl_budget_theme',dark?'dark':'light');}catch(e){}
+  updateThemeButton();
+});
+function renderCountdown(){
+  const el=document.getElementById('moveCountdown');
+  let diff=Math.max(0,MOVE_IN_TARGET-Date.now());
+  const day=86400000,hour=3600000,minute=60000;
+  const d=Math.floor(diff/day); diff-=d*day;
+  const h=Math.floor(diff/hour); diff-=h*hour;
+  const m=Math.floor(diff/minute); diff-=m*minute;
+  const s=Math.floor(diff/1000);
+  el.innerHTML=`<span class="countdown-title">距离搬进新家还有</span><span class="countdown-time">
+    <span class="countdown-unit"><span class="countdown-num">${d}</span><span class="countdown-label">天</span></span>
+    <span class="countdown-unit"><span class="countdown-num">${String(h).padStart(2,'0')}</span><span class="countdown-label">时</span></span>
+    <span class="countdown-unit"><span class="countdown-num">${String(m).padStart(2,'0')}</span><span class="countdown-label">分</span></span>
+    <span class="countdown-unit"><span class="countdown-num">${String(s).padStart(2,'0')}</span><span class="countdown-label">秒</span></span>
+  </span>`;
+}
+function renderTimeline(){
+  document.getElementById('timeline').innerHTML=ITEMS.map(item=>`
+    <article class="milestone ${item.state==='当前推进'?'current':''}">
+      <div class="panel">
+        <div class="meta"><span class="date">${item.date}</span><span class="state">${item.state}</span></div>
+        <h2>${item.title}</h2>
+        <p>${item.text}</p>
+        <div class="subtasks">${item.tasks.map(t=>`<span>${t}</span>`).join('')}</div>
+      </div>
+      <div class="rail"><div class="node">${item.icon}</div></div>
+    </article>`).join('');
+}
+renderTimeline();
+renderCountdown();
+setInterval(renderCountdown,1000);
+updateThemeButton();
+const io=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(entry.isIntersecting){
+    entry.target.classList.add('in');
+    io.unobserve(entry.target);
+  }
+}),{threshold:.12});
+document.querySelectorAll('.milestone').forEach((item,index)=>{
+  item.style.transitionDelay=(index*.05)+'s';
+  io.observe(item);
+});
+</script>
+</body>
+</html>
