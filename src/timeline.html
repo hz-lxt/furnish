@@ -65,7 +65,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .milestone:nth-child(even) .panel{grid-column:3}
 .rail{grid-column:2;grid-row:1;display:flex;justify-content:center;position:relative;z-index:2}
 .node{
-  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:22px;
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;font-weight:900;letter-spacing:1px;
   background:linear-gradient(135deg,var(--green),var(--blue));border:3px solid rgba(255,255,255,.72);
   box-shadow:0 12px 26px var(--shadow),0 0 0 7px rgba(199,154,82,.12);
 }
@@ -97,7 +97,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
   .milestone{grid-template-columns:52px 1fr;gap:10px;align-items:start}
   .milestone:nth-child(odd) .panel,.milestone:nth-child(even) .panel{grid-column:2}
   .rail{grid-column:1}
-  .node{width:44px;height:44px;font-size:19px}
+  .node{width:44px;height:44px;font-size:12px}
   .countdown{align-items:flex-start;flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){
@@ -130,16 +130,16 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 <script>
 const MOVE_IN_TARGET=new Date("2027-01-01T00:00:00+08:00").getTime();
 const ITEMS=[
-  {date:"2026年4月",icon:"钥",title:"房屋交付前",state:"已完成",text:"验房、设计、物业手续先落地，预算表从这里开始。",tasks:["监理验房","平面图","物业费用","维修基金"]},
-  {date:"2026年5月",icon:"拆",title:"开工准备与拆改",state:"已完成",text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。",tasks:["工长服务","封窗","砸墙清运","砌墙"]},
-  {date:"2026年6月",icon:"电",title:"水电与隐蔽工程",state:"已完成",text:"隐蔽工程决定后面的稳定性，水电材料和开孔一起核对。",tasks:["水电人工","水电材料","打孔","验收留档"]},
-  {date:"2026年7月",icon:"水",title:"防水与瓦工瓷砖",state:"当前推进",text:"防水、瓦工、瓷砖进入硬装关键段，付款与验收需要盯紧。",tasks:["瓷砖定金","瓦工人工","瓷砖尾款","包立管"]},
-  {date:"2026年8月",icon:"木",title:"木工与吊顶",state:"待推进",text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。",tasks:["客餐厅吊顶","木工人工","木工辅料","基层"]},
-  {date:"2026年9月",icon:"漆",title:"墙面与油漆",state:"待推进",text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。",tasks:["基层处理","油工人工","油工辅料","油漆"]},
-  {date:"2026年10-11月",icon:"装",title:"主材与安装",state:"待推进",text:"门、卫浴、灯具、开关面板集中安装，预算波动会比较明显。",tasks:["室内门","水槽马桶","灯具","开关面板"]},
-  {date:"2026年11-12月",icon:"家",title:"家具软装与家电",state:"待推进",text:"从功能完成走向入住质感，家具、家电、窗帘一起补齐。",tasks:["家具软装","中央空调","厨电","智能家居"]},
-  {date:"2026年12月",icon:"净",title:"保洁验收",state:"待推进",text:"开荒、验收、问题修补，给入住前最后一轮整理留时间。",tasks:["开荒保洁","垃圾清运","修补清单","入住检查"]},
-  {date:"2027年1月",icon:"住",title:"搬进新家",state:"目标",text:"把账、物、空间一起收束，正式进入新家的日常。",tasks:["结算","备用金","入住采购","搬家"]}
+  {date:"2026年4月",icon:"交付",title:"房屋交付前",state:"已完成",text:"验房、设计、物业手续先落地，预算表从这里开始。",tasks:["监理验房","平面图","物业费用","维修基金"]},
+  {date:"2026年5月",icon:"拆改",title:"开工准备与拆改",state:"已完成",text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。",tasks:["工长服务","封窗","砸墙清运","砌墙"]},
+  {date:"2026年6月",icon:"水电",title:"水电与隐蔽工程",state:"已完成",text:"隐蔽工程决定后面的稳定性，水电材料和开孔一起核对。",tasks:["水电人工","水电材料","打孔","验收留档"]},
+  {date:"2026年7月",icon:"瓷砖",title:"防水与瓦工瓷砖",state:"已完成",text:"防水、瓦工和瓷砖施工已经完成。",tasks:["瓷砖定金","瓦工人工","瓷砖尾款","包立管"]},
+  {date:"2026年8月",icon:"木工",title:"木工与吊顶",state:"待推进",text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。",tasks:["客餐厅吊顶","木工人工","木工辅料","基层"]},
+  {date:"2026年9月",icon:"油漆",title:"墙面与油漆",state:"待推进",text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。",tasks:["基层处理","油工人工","油工辅料","油漆"]},
+  {date:"2026年10-11月",icon:"安装",title:"主材与安装",state:"待推进",text:"门、卫浴、灯具、开关面板集中安装，预算波动会比较明显。",tasks:["室内门","水槽马桶","灯具","开关面板"]},
+  {date:"2026年11-12月",icon:"软装",title:"家具软装与家电",state:"待推进",text:"从功能完成走向入住质感，家具、家电、窗帘一起补齐。",tasks:["家具软装","中央空调","厨电","智能家居"]},
+  {date:"2026年12月",icon:"验收",title:"保洁验收",state:"待推进",text:"开荒、验收、问题修补，给入住前最后一轮整理留时间。",tasks:["开荒保洁","垃圾清运","修补清单","入住检查"]},
+  {date:"2027年1月",icon:"入住",title:"搬进新家",state:"目标",text:"把账、物、空间一起收束，正式进入新家的日常。",tasks:["结算","备用金","入住采购","搬家"]}
 ];
 function updateThemeButton(){
   const btn=document.getElementById('themeToggle');
