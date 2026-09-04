@@ -68,14 +68,29 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
   width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;font-weight:900;letter-spacing:1px;
   background:linear-gradient(135deg,var(--green),var(--blue));border:3px solid rgba(255,255,255,.72);
   box-shadow:0 12px 26px var(--shadow),0 0 0 7px rgba(199,154,82,.12);
+  transition:transform .3s,box-shadow .3s,background .3s;
 }
-.milestone.current .node{background:linear-gradient(135deg,var(--gold),var(--green));animation:pulse 1.8s ease-in-out infinite}
-@keyframes pulse{50%{box-shadow:0 12px 26px var(--shadow),0 0 0 14px rgba(199,154,82,.18)}}
+.milestone.completed .node{background:linear-gradient(135deg,#17633F,#2E8B5D);box-shadow:0 10px 24px rgba(23,99,63,.3),0 0 0 7px rgba(46,139,93,.14)}
+.milestone.pending .node{background:linear-gradient(135deg,#68766F,#8D9993);box-shadow:0 8px 18px rgba(45,58,51,.18),0 0 0 6px rgba(104,118,111,.1)}
+.milestone.target .node{background:linear-gradient(135deg,#255D78,#428FAF);box-shadow:0 10px 24px rgba(37,93,120,.26),0 0 0 7px rgba(66,143,175,.14)}
+.milestone.current .node{
+  background:linear-gradient(135deg,#F4B640,#C75B18);transform:scale(1.12);border-color:#FFF3CF;
+  box-shadow:0 14px 32px rgba(199,91,24,.42),0 0 0 9px rgba(244,182,64,.24);animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{50%{box-shadow:0 16px 36px rgba(199,91,24,.48),0 0 0 16px rgba(244,182,64,.18)}}
 .panel{
   position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:8px;
   backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%);
   box-shadow:0 12px 30px var(--shadow),inset 0 1px rgba(255,255,255,.28);padding:18px;transition:.3s cubic-bezier(.2,.8,.2,1);
 }
+.milestone.completed .panel{border-left:4px solid #2E8B5D}
+.milestone.pending .panel{border-left:4px solid #8D9993}
+.milestone.target .panel{border-left:4px solid #428FAF}
+.milestone.current .panel{
+  border:2px solid #E89A1F;background:linear-gradient(135deg,rgba(255,247,225,.92),rgba(255,255,255,.72));
+  box-shadow:0 20px 44px rgba(199,91,24,.24),0 0 0 5px rgba(244,182,64,.14),inset 0 1px rgba(255,255,255,.56);
+}
+:root[data-theme="dark"] .milestone.current .panel{background:linear-gradient(135deg,rgba(80,52,20,.9),rgba(35,31,24,.82))}
 .panel::after{
   content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.22),transparent 65%);
   transform:translateX(-120%);transition:.75s cubic-bezier(.2,.8,.2,1);
@@ -85,12 +100,36 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .date{font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:0;white-space:nowrap}
 .state{font-size:12px;border-radius:999px;padding:3px 9px;background:rgba(55,107,85,.12);color:var(--green);font-weight:800}
-.milestone.current .state{background:rgba(199,154,82,.18);color:var(--gold)}
+.milestone.completed .state{background:#17633F;color:#fff}
+.milestone.pending .state{background:rgba(104,118,111,.16);color:var(--muted)}
+.milestone.target .state{background:#255D78;color:#fff}
+.milestone.current .state{background:#C75B18;color:#fff;box-shadow:0 5px 14px rgba(199,91,24,.3)}
 .panel h2{font-size:20px;color:var(--dark);letter-spacing:0;margin-bottom:7px}
 .panel p{font-size:13px;color:var(--muted);margin-bottom:13px}
-.subtasks{display:flex;gap:8px;flex-wrap:wrap}
-.subtasks span{border:1px solid var(--line);background:rgba(255,255,255,.32);color:var(--ink);border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}
-:root[data-theme="dark"] .subtasks span{background:rgba(255,255,255,.06)}
+.stage-stats{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 14px}
+.stat-pill{display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800;border:1px solid var(--line)}
+.stat-pill.price{background:rgba(199,154,82,.13);color:#8B5E16;border-color:rgba(199,154,82,.28)}
+.stat-pill.duration{background:rgba(47,110,143,.1);color:var(--blue);border-color:rgba(47,110,143,.22)}
+:root[data-theme="dark"] .stat-pill.price{color:#F0C77F}
+.detail-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);
+  border-radius:9px;padding:10px 12px;background:rgba(255,255,255,.34);color:var(--dark);font:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;transition:background .2s,border-color .2s,transform .2s;
+}
+:root[data-theme="dark"] .detail-toggle{background:rgba(255,255,255,.06)}
+.detail-toggle:hover{background:rgba(199,154,82,.12);border-color:rgba(199,154,82,.46)}
+.detail-toggle:active{transform:scale(.99)}
+.toggle-icon{font-size:18px;line-height:1;transition:transform .25s}
+.detail-toggle[aria-expanded="true"] .toggle-icon{transform:rotate(180deg)}
+.details{margin-top:10px;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:rgba(255,255,255,.25)}
+:root[data-theme="dark"] .details{background:rgba(255,255,255,.035)}
+.details[hidden]{display:none}
+.detail-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+.detail-row:last-child{border-bottom:none}
+.detail-name{min-width:0;font-size:13px;font-weight:750;color:var(--ink)}
+.detail-meta{display:block;margin-top:2px;color:var(--muted);font-size:11px;font-weight:500}
+.detail-price{font-size:13px;font-weight:900;color:var(--dark);font-variant-numeric:tabular-nums;white-space:nowrap}
+.detail-empty{padding:12px;color:var(--muted);font-size:12px;text-align:center}
 @media(max-width:760px){
   .hero h1{font-size:26px}
   .timeline::before{left:26px}
@@ -98,6 +137,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
   .milestone:nth-child(odd) .panel,.milestone:nth-child(even) .panel{grid-column:2}
   .rail{grid-column:1}
   .node{width:44px;height:44px;font-size:12px}
+  .milestone.current .node{transform:scale(1.06)}
   .countdown{align-items:flex-start;flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){
@@ -129,18 +169,51 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 </main>
 <script>
 const MOVE_IN_TARGET=new Date("2027-01-01T00:00:00+08:00").getTime();
+const BUDGET_STORAGE_KEY="yxsl_budget_v7";
 const ITEMS=[
-  {date:"2026年4月",icon:"交付",title:"房屋交付前",state:"已完成",text:"验房、设计、物业手续先落地，预算表从这里开始。",tasks:["监理验房","平面图","物业费用","维修基金"]},
-  {date:"2026年5月",icon:"拆改",title:"开工准备与拆改",state:"已完成",text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。",tasks:["工长服务","封窗","砸墙清运","砌墙"]},
-  {date:"2026年6月",icon:"水电",title:"水电与隐蔽工程",state:"已完成",text:"隐蔽工程决定后面的稳定性，水电材料和开孔一起核对。",tasks:["水电人工","水电材料","打孔","验收留档"]},
-  {date:"2026年7月",icon:"瓷砖",title:"防水与瓦工瓷砖",state:"已完成",text:"防水、瓦工和瓷砖施工已经完成。",tasks:["瓷砖定金","瓦工人工","瓷砖尾款","包立管"]},
-  {date:"2026年8月",icon:"木工",title:"木工与吊顶",state:"待推进",text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。",tasks:["客餐厅吊顶","木工人工","木工辅料","基层"]},
-  {date:"2026年9月",icon:"油漆",title:"墙面与油漆",state:"待推进",text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。",tasks:["基层处理","油工人工","油工辅料","油漆"]},
-  {date:"2026年10-11月",icon:"安装",title:"主材与安装",state:"待推进",text:"门、卫浴、灯具、开关面板集中安装，预算波动会比较明显。",tasks:["室内门","水槽马桶","灯具","开关面板"]},
-  {date:"2026年11-12月",icon:"软装",title:"家具软装与家电",state:"待推进",text:"从功能完成走向入住质感，家具、家电、窗帘一起补齐。",tasks:["家具软装","中央空调","厨电","智能家居"]},
-  {date:"2026年12月",icon:"验收",title:"保洁验收",state:"待推进",text:"开荒、验收、问题修补，给入住前最后一轮整理留时间。",tasks:["开荒保洁","垃圾清运","修补清单","入住检查"]},
-  {date:"2027年1月",icon:"入住",title:"搬进新家",state:"目标",text:"把账、物、空间一起收束，正式进入新家的日常。",tasks:["结算","备用金","入住采购","搬家"]}
+  {date:"2026年4-5月",icon:"交付",title:"房屋交付前",state:"已完成",start:"2026-04-22",end:"2026-05-05",stageKeys:["01 房屋交付前"],text:"验房、设计、物业手续先落地，预算表从这里开始。"},
+  {date:"2026年5-6月",icon:"拆改",title:"开工准备与拆改",state:"已完成",start:"2026-05-23",end:"2026-06-24",stageKeys:["02 开工准备与拆改"],text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。"},
+  {date:"2026年6月",icon:"水电",title:"水电与隐蔽工程",state:"已完成",start:"2026-06-20",end:"2026-06-24",stageKeys:["03 水电与隐蔽工程"],text:"隐蔽工程决定后面的稳定性，水电材料和开孔一起核对。"},
+  {date:"2026年7月",icon:"瓷砖",title:"防水与瓦工瓷砖",state:"已完成",start:"2026-07-02",end:"2026-07-08",stageKeys:["04 防水与瓦工瓷砖"],text:"防水、瓦工和瓷砖施工已经完成。"},
+  {date:"2026年8月至今",icon:"木工",title:"木工与吊顶",state:"进行中",start:"2026-08-01",stageKeys:["05 木工与吊顶"],text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。"},
+  {date:"2026年9月",icon:"油漆",title:"墙面与油漆",state:"待推进",start:"2026-09-01",end:"2026-09-30",stageKeys:["06 墙面与油漆"],text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。"},
+  {date:"2026年10-11月",icon:"安装",title:"主材与安装",state:"待推进",start:"2026-10-01",end:"2026-11-30",stageKeys:["07 主材与安装"],text:"门、卫浴、灯具、开关面板集中安装，预算波动会比较明显。"},
+  {date:"2026年11-12月",icon:"软装",title:"家具软装与家电",state:"待推进",start:"2026-11-01",end:"2026-12-31",stageKeys:["09 家具与软装","10 家电与智能家居"],text:"从功能完成走向入住质感，家具、家电、窗帘一起补齐。"},
+  {date:"2026年12月",icon:"验收",title:"保洁验收",state:"待推进",start:"2026-12-01",end:"2026-12-31",stageKeys:["11 保洁验收与入住"],text:"开荒、验收、问题修补，给入住前最后一轮整理留时间。"},
+  {date:"2027年1月",icon:"入住",title:"搬进新家",state:"目标",start:"2027-01-01",end:"2027-01-31",stageKeys:["12 结算与备用金"],text:"把账、物、空间一起收束，正式进入新家的日常。"}
 ];
+const money=new Intl.NumberFormat("zh-CN",{style:"currency",currency:"CNY",minimumFractionDigits:0,maximumFractionDigits:1});
+const escapeHTML=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[char]);
+const formatMoney=value=>money.format(Number(value)||0).replace("CN¥","¥");
+function stateClass(state){
+  if(state==="已完成")return "completed";
+  if(state==="进行中")return "current";
+  if(state==="目标")return "target";
+  return "pending";
+}
+function durationLabel(item){
+  const start=new Date(`${item.start}T00:00:00+08:00`);
+  const end=item.state==="进行中"?new Date():new Date(`${item.end}T00:00:00+08:00`);
+  const days=Math.max(1,Math.floor((end-start)/86400000)+1);
+  const prefix=item.state==="已完成"?"实际耗时":item.state==="进行中"?"已进行":"计划耗时";
+  return `${prefix} ${days} 天`;
+}
+async function loadBudgetStages(){
+  try{
+    const saved=localStorage.getItem(BUDGET_STORAGE_KEY);
+    if(saved){
+      const parsed=JSON.parse(saved);
+      if(Array.isArray(parsed))return parsed;
+    }
+  }catch(error){console.warn("读取本地预算失败",error)}
+  try{
+    const response=await fetch("../data/budget-seed.json",{cache:"no-store"});
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    const parsed=await response.json();
+    if(Array.isArray(parsed))return parsed;
+  }catch(error){console.warn("读取预算种子数据失败",error)}
+  return [];
+}
 function updateThemeButton(){
   const btn=document.getElementById('themeToggle');
   btn.textContent=document.documentElement.dataset.theme==='dark'?'浅色模式':'深色模式';
@@ -166,32 +239,62 @@ function renderCountdown(){
     <span class="countdown-unit"><span class="countdown-num">${String(s).padStart(2,'0')}</span><span class="countdown-label">秒</span></span>
   </span>`;
 }
-function renderTimeline(){
-  document.getElementById('timeline').innerHTML=ITEMS.map(item=>`
-    <article class="milestone ${item.state==='当前推进'?'current':''}">
+function renderTimeline(budgetStages){
+  const hasBudgetData=budgetStages.length>0;
+  document.getElementById('timeline').innerHTML=ITEMS.map((item,index)=>{
+    const stageItems=budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap(stage=>stage.items||[]);
+    const totalBudget=stageItems.reduce((sum,entry)=>sum+(Number(entry.budget)||0),0);
+    const details=stageItems.length?stageItems.map(entry=>`
+      <div class="detail-row">
+        <div class="detail-name">${escapeHTML(entry.name||entry.cat||"未命名子项")}
+          <span class="detail-meta">${escapeHTML([entry.cat,entry.space].filter(Boolean).join(" · "))}${Number(entry.paid)>0?` · 已付 ${formatMoney(entry.paid)}`:""}</span>
+        </div>
+        <div class="detail-price">${Number(entry.budget)>0?formatMoney(entry.budget):"待定"}</div>
+      </div>`).join(""):`<div class="detail-empty">${hasBudgetData?"该阶段暂无预算子项":"预算数据暂时无法读取"}</div>`;
+    return `
+    <article class="milestone ${stateClass(item.state)}">
       <div class="panel">
-        <div class="meta"><span class="date">${item.date}</span><span class="state">${item.state}</span></div>
-        <h2>${item.title}</h2>
-        <p>${item.text}</p>
-        <div class="subtasks">${item.tasks.map(t=>`<span>${t}</span>`).join('')}</div>
+        <div class="meta"><span class="date">${escapeHTML(item.date)}</span><span class="state">${escapeHTML(item.state)}</span></div>
+        <h2>${escapeHTML(item.title)}</h2>
+        <p>${escapeHTML(item.text)}</p>
+        <div class="stage-stats">
+          <span class="stat-pill price">阶段预算 ${hasBudgetData&&totalBudget>0?formatMoney(totalBudget):"待定"}</span>
+          <span class="stat-pill duration">${durationLabel(item)}</span>
+        </div>
+        <button class="detail-toggle" type="button" aria-expanded="false" aria-controls="details-${index}">
+          <span>展开全部子项 · ${stageItems.length} 项</span><span class="toggle-icon">⌄</span>
+        </button>
+        <div class="details" id="details-${index}" hidden>${details}</div>
       </div>
-      <div class="rail"><div class="node">${item.icon}</div></div>
-    </article>`).join('');
+      <div class="rail"><div class="node">${escapeHTML(item.icon)}</div></div>
+    </article>`}).join('');
 }
-renderTimeline();
 renderCountdown();
 setInterval(renderCountdown,1000);
 updateThemeButton();
-const io=new IntersectionObserver(entries=>entries.forEach(entry=>{
-  if(entry.isIntersecting){
-    entry.target.classList.add('in');
-    io.unobserve(entry.target);
-  }
-}),{threshold:.12});
-document.querySelectorAll('.milestone').forEach((item,index)=>{
-  item.style.transitionDelay=(index*.05)+'s';
-  io.observe(item);
+document.getElementById("timeline").addEventListener("click",event=>{
+  const button=event.target.closest(".detail-toggle");
+  if(!button)return;
+  const details=document.getElementById(button.getAttribute("aria-controls"));
+  const expanded=button.getAttribute("aria-expanded")==="true";
+  button.setAttribute("aria-expanded",String(!expanded));
+  button.querySelector("span:first-child").textContent=`${expanded?"展开":"收起"}全部子项 · ${details.querySelectorAll(".detail-row").length} 项`;
+  details.hidden=expanded;
 });
+async function initTimeline(){
+  renderTimeline(await loadBudgetStages());
+  const io=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('in');
+      io.unobserve(entry.target);
+    }
+  }),{threshold:.12});
+  document.querySelectorAll('.milestone').forEach((item,index)=>{
+    item.style.transitionDelay=(index*.05)+'s';
+    io.observe(item);
+  });
+}
+initTimeline();
 </script>
 </body>
 </html>
