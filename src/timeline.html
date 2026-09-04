@@ -40,8 +40,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .btn{border:1px solid var(--line);background:var(--card);color:var(--dark);border-radius:10px;padding:9px 14px;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer;transition:.25s}
 .btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px var(--shadow);border-color:rgba(199,154,82,.5)}
 .hero{max-width:1120px;margin:0 auto;padding:34px 20px 18px}
-.hero h1{font-size:34px;line-height:1.15;color:var(--dark);letter-spacing:0;margin-bottom:10px}
-.hero p{color:var(--muted);font-size:14px;max-width:680px}
+.hero h1{font-size:34px;line-height:1.15;color:var(--dark);letter-spacing:0;margin-bottom:0}
 .countdown{
   display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:10px 12px;border-radius:12px;
   background:var(--card);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
@@ -160,7 +159,6 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 <main>
   <section class="hero">
     <h1>从毛坯到新家，每一步都看得见</h1>
-    <p>大节点负责把控阶段，小节点记录关键动作。当前推进节点会高亮，滚动时节点逐步浮入。</p>
     <div class="countdown" id="moveCountdown"></div>
   </section>
   <section class="timeline-wrap">
@@ -175,8 +173,8 @@ const ITEMS=[
   {date:"2026年5-6月",icon:"拆改",title:"开工准备与拆改",state:"已完成",start:"2026-05-23",end:"2026-06-24",stageKeys:["02 开工准备与拆改"],text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。"},
   {date:"2026年6月",icon:"水电",title:"水电与隐蔽工程",state:"已完成",start:"2026-06-20",end:"2026-06-24",stageKeys:["03 水电与隐蔽工程"],text:"隐蔽工程决定后面的稳定性，水电材料和开孔一起核对。"},
   {date:"2026年7月",icon:"瓷砖",title:"防水与瓦工瓷砖",state:"已完成",start:"2026-07-02",end:"2026-07-08",stageKeys:["04 防水与瓦工瓷砖"],text:"防水、瓦工和瓷砖施工已经完成。"},
-  {date:"2026年8月至今",icon:"木工",title:"木工与吊顶",state:"进行中",start:"2026-08-01",stageKeys:["05 木工与吊顶"],text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。"},
-  {date:"2026年9月",icon:"油漆",title:"墙面与油漆",state:"待推进",start:"2026-09-01",end:"2026-09-30",stageKeys:["06 墙面与油漆"],text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。"},
+  {date:"2026年8月",icon:"木工",title:"木工与吊顶",state:"已完成",start:"2026-08-01",end:"2026-08-31",stageKeys:["05 木工与吊顶"],text:"木作基层和吊顶影响空间比例，适合和灯位、风口一起复核。"},
+  {date:"2026年9月至今",icon:"油漆",title:"墙面与油漆",state:"进行中",start:"2026-09-01",end:"2026-09-30",stageKeys:["06 墙面与油漆"],text:"墙面进入显性效果阶段，颜色、基层、修补细节都要收口。"},
   {date:"2026年10-11月",icon:"安装",title:"主材与安装",state:"待推进",start:"2026-10-01",end:"2026-11-30",stageKeys:["07 主材与安装"],text:"门、卫浴、灯具、开关面板集中安装，预算波动会比较明显。"},
   {date:"2026年11-12月",icon:"软装",title:"家具软装与家电",state:"待推进",start:"2026-11-01",end:"2026-12-31",stageKeys:["09 家具与软装","10 家电与智能家居"],text:"从功能完成走向入住质感，家具、家电、窗帘一起补齐。"},
   {date:"2026年12月",icon:"验收",title:"保洁验收",state:"待推进",start:"2026-12-01",end:"2026-12-31",stageKeys:["11 保洁验收与入住"],text:"开荒、验收、问题修补，给入住前最后一轮整理留时间。"},
@@ -191,12 +189,28 @@ function stateClass(state){
   if(state==="目标")return "target";
   return "pending";
 }
-function durationLabel(item){
-  const start=new Date(`${item.start}T00:00:00+08:00`);
-  const end=item.state==="进行中"?new Date():new Date(`${item.end}T00:00:00+08:00`);
-  const days=Math.max(1,Math.floor((end-start)/86400000)+1);
-  const prefix=item.state==="已完成"?"实际耗时":item.state==="进行中"?"已进行":"计划耗时";
+function durationLabel(item,state,stageItems){
+  const datedItems=stageItems.map(entry=>entry.date).filter(Boolean).sort();
+  const actualStart=datedItems[0]||item.start;
+  const actualEnd=datedItems[datedItems.length-1]||item.end;
+  const start=new Date(`${state==="待推进"||state==="目标"?item.start:actualStart}T00:00:00+08:00`);
+  const end=state==="进行中"?new Date():new Date(`${state==="待推进"||state==="目标"?item.end:actualEnd}T00:00:00+08:00`);
+  const days=Math.max(state==="进行中"?0:1,Math.floor((end-start)/86400000)+1);
+  const prefix=state==="已完成"?"实际耗时":state==="进行中"?"已进行":"计划耗时";
   return `${prefix} ${days} 天`;
+}
+function resolveStates(stageGroups){
+  const states=ITEMS.map(item=>item.state);
+  let currentIndex=states.indexOf("进行中");
+  while(currentIndex>=0&&currentIndex<ITEMS.length){
+    const items=stageGroups[currentIndex];
+    const allCompleted=items.length>0&&items.every(entry=>entry.status==="已完成");
+    if(!allCompleted)break;
+    states[currentIndex]="已完成";
+    currentIndex+=1;
+    if(currentIndex<ITEMS.length)states[currentIndex]="进行中";
+  }
+  return states;
 }
 async function loadBudgetStages(){
   try{
@@ -232,7 +246,7 @@ function renderCountdown(){
   const h=Math.floor(diff/hour); diff-=h*hour;
   const m=Math.floor(diff/minute); diff-=m*minute;
   const s=Math.floor(diff/1000);
-  el.innerHTML=`<span class="countdown-title">距离搬进新家还有</span><span class="countdown-time">
+  el.innerHTML=`<span class="countdown-title">距离 2027年1月1日 搬进新家还有</span><span class="countdown-time">
     <span class="countdown-unit"><span class="countdown-num">${d}</span><span class="countdown-label">天</span></span>
     <span class="countdown-unit"><span class="countdown-num">${String(h).padStart(2,'0')}</span><span class="countdown-label">时</span></span>
     <span class="countdown-unit"><span class="countdown-num">${String(m).padStart(2,'0')}</span><span class="countdown-label">分</span></span>
@@ -241,25 +255,28 @@ function renderCountdown(){
 }
 function renderTimeline(budgetStages){
   const hasBudgetData=budgetStages.length>0;
+  const stageGroups=ITEMS.map(item=>budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap(stage=>stage.items||[]));
+  const resolvedStates=resolveStates(stageGroups);
   document.getElementById('timeline').innerHTML=ITEMS.map((item,index)=>{
-    const stageItems=budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap(stage=>stage.items||[]);
-    const totalBudget=stageItems.reduce((sum,entry)=>sum+(Number(entry.budget)||0),0);
+    const stageItems=stageGroups[index];
+    const resolvedState=resolvedStates[index];
+    const totalSpent=stageItems.reduce((sum,entry)=>sum+(Number(entry.paid)||0),0);
     const details=stageItems.length?stageItems.map(entry=>`
       <div class="detail-row">
         <div class="detail-name">${escapeHTML(entry.name||entry.cat||"未命名子项")}
-          <span class="detail-meta">${escapeHTML([entry.cat,entry.space].filter(Boolean).join(" · "))}${Number(entry.paid)>0?` · 已付 ${formatMoney(entry.paid)}`:""}</span>
+          <span class="detail-meta">${escapeHTML([entry.cat,entry.space].filter(Boolean).join(" · "))}${Number(entry.budget)>0?` · 预算 ${formatMoney(entry.budget)}`:""}</span>
         </div>
-        <div class="detail-price">${Number(entry.budget)>0?formatMoney(entry.budget):"待定"}</div>
+        <div class="detail-price">已花费 ${formatMoney(entry.paid)}</div>
       </div>`).join(""):`<div class="detail-empty">${hasBudgetData?"该阶段暂无预算子项":"预算数据暂时无法读取"}</div>`;
     return `
-    <article class="milestone ${stateClass(item.state)}">
+    <article class="milestone ${stateClass(resolvedState)}">
       <div class="panel">
-        <div class="meta"><span class="date">${escapeHTML(item.date)}</span><span class="state">${escapeHTML(item.state)}</span></div>
+        <div class="meta"><span class="date">${escapeHTML(item.date)}</span><span class="state">${escapeHTML(resolvedState)}</span></div>
         <h2>${escapeHTML(item.title)}</h2>
         <p>${escapeHTML(item.text)}</p>
         <div class="stage-stats">
-          <span class="stat-pill price">阶段预算 ${hasBudgetData&&totalBudget>0?formatMoney(totalBudget):"待定"}</span>
-          <span class="stat-pill duration">${durationLabel(item)}</span>
+          <span class="stat-pill price">阶段花费 ${hasBudgetData?formatMoney(totalSpent):"待定"}</span>
+          <span class="stat-pill duration">${durationLabel(item,resolvedState,stageItems)}</span>
         </div>
         <button class="detail-toggle" type="button" aria-expanded="false" aria-controls="details-${index}">
           <span>展开全部子项 · ${stageItems.length} 项</span><span class="toggle-icon">⌄</span>
