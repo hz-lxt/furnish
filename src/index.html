@@ -448,10 +448,40 @@ const CLOUD_DOC_ID = "main";
 const EDIT_PASS_KEY = "yxsl_budget_edit_password_v2";
 const MOVE_IN_TARGET = new Date("2027-01-01T00:00:00+08:00").getTime();
 const SAVING_STAGE = {stage:"特别省下的钱",kind:"savings",noStat:true,items:[]};
+const SCREENSHOT_IMPORT_V1 = [
+  ["02 开工准备与拆改","门窗","阳台","封窗尾款",9000,"2026-07-15"],
+  ["07 主材与安装","五金","卫生间","地漏",134,"2026-07-09"],
+  ["07 主材与安装","灯具","全屋","线性灯带",200,"2026-08-04"],
+  ["07 主材与安装","灯具","全屋","铝槽",200,"2026-08-04","小彤付"],
+  ["回款 · 回收返款","回款","全屋","瓷砖退款",680,"2026-08-07","瓷砖退款"],
+  ["05 木工与吊顶","吊顶","全屋","吊顶材料",1960,"2026-08-08"],
+  ["05 木工与吊顶","吊顶","全屋","吊顶搬运费",200,"2026-08-09"],
+  ["04 防水与瓦工瓷砖","美缝","全屋","美缝",3500,"2026-08-10"],
+  ["05 木工与吊顶","吊顶","全屋","吊顶材料",1100,"2026-08-12"],
+  ["05 木工与吊顶","吊顶","全屋","吊顶运费",190,"2026-08-12"],
+  ["10 家电与智能家居","空调","全屋","空调×3",4830,"2026-08-14","截图：¥1,610 × 3"],
+  ["05 木工与吊顶","柜体","全屋","柜子材料",10122,"2026-08-18"],
+  ["05 木工与吊顶","柜体","全屋","柜子搬运费",380,"2026-08-19"],
+  ["05 木工与吊顶","柜体","全屋","柜子材料",2564,"2026-08-28"],
+  ["05 木工与吊顶","柜体","全屋","柜子搬运费",165,"2026-08-28"],
+  ["07 主材与安装","厨电","厨房","油烟机止逆阀+烟管",100,"2026-08-29"],
+  ["06 墙面与油漆","人工","全屋","油漆工人",9781.75,"2026-08-31"],
+  ["05 木工与吊顶","柜体","全屋","柜子材料",1344.5,"2026-09-01"],
+  ["05 木工与吊顶","柜体","全屋","柜子搬运费",140,"2026-09-01","小彤付"],
+  ["07 主材与安装","石材","厨房","厨房石材",2100,"2026-09-01"],
+  ["06 墙面与油漆","材料","全屋","油漆材料",3822,"2026-09-03"],
+  ["11 保洁验收与入住","清运","全屋","垃圾清运",320,"2026-09-03"],
+  ["05 木工与吊顶","人工","全屋","木工价格",16100,"2026-09-03"],
+  ["06 墙面与油漆","辅材","全屋","阳角条圆弧",90,"2026-09-06"],
+  ["05 木工与吊顶","辅材","全屋","钢架膨胀螺丝",10,"2026-09-06"],
+  ["05 木工与吊顶","钢架","电竞房","电竞房钢架",450,"2026-09-08"]
+];
 
 function loadData(){
-  try{const s=localStorage.getItem(LS_KEY); if(s) return normalizeData(JSON.parse(s));}catch(e){}
-  return normalizeData(JSON.parse(JSON.stringify(SEED)));
+  try{const s=localStorage.getItem(LS_KEY); if(s){const data=normalizeData(JSON.parse(s));localStorage.setItem(LS_KEY,JSON.stringify(data));return data;}}catch(e){}
+  const data=normalizeData(JSON.parse(JSON.stringify(SEED)));
+  localStorage.setItem(LS_KEY,JSON.stringify(data));
+  return data;
 }
 let DATA = loadData();
 let filter="all", keyword="";
@@ -475,6 +505,14 @@ function normalizeData(data){
   if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
     arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
   }
+  SCREENSHOT_IMPORT_V1.forEach((entry,index)=>{
+    const [stage,cat,space,name,paid,date,note=""] = entry;
+    const target=arr.find(s=>s.stage===stage);
+    const importKey=`screenshot-v1-${index}`;
+    if(target && !target.items.some(it=>it.importKey===importKey)){
+      target.items.push({cat,space,name,brand:"",budget:0,paid,unpaid:0,date,status:"已完成",note:note||"截图补录",importKey});
+    }
+  });
   return arr;
 }
 
