@@ -476,6 +476,11 @@ const SCREENSHOT_IMPORT_V1 = [
   ["05 木工与吊顶","辅材","全屋","钢架膨胀螺丝",10,"2026-09-06"],
   ["05 木工与吊顶","钢架","电竞房","电竞房钢架",450,"2026-09-08"]
 ];
+// 已存在于云端明细中的截图补录项；保留原账，避免同一笔付款重复统计。
+const DUPLICATE_SCREENSHOT_IMPORT_KEYS = new Set([
+  "screenshot-v1-5","screenshot-v1-6","screenshot-v1-8","screenshot-v1-9",
+  "screenshot-v1-11","screenshot-v1-12","screenshot-v1-17","screenshot-v1-22"
+]);
 const REQUIRED_RECEIPTS_V2 = [
   ["07 主材与安装","石材","厨房","厨房石材",2100,"2026-09-01"],
   ["06 墙面与油漆","材料","全屋","油漆材料",3822,"2026-09-03"]
@@ -505,7 +510,9 @@ function formatDateLabel(v){
 
 function normalizeData(data){
   const arr=Array.isArray(data)?data:[];
-  arr.forEach(s=>s.items=(Array.isArray(s.items)?s.items:[]).map(it=>({...it,unpaid:0})));
+  arr.forEach(s=>s.items=(Array.isArray(s.items)?s.items:[])
+    .filter(it=>!DUPLICATE_SCREENSHOT_IMPORT_KEYS.has(it.importKey))
+    .map(it=>({...it,unpaid:0})));
   if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
     arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
   }
@@ -513,6 +520,7 @@ function normalizeData(data){
     const [stage,cat,space,name,paid,date,note=""] = entry;
     const target=arr.find(s=>s.stage===stage);
     const importKey=`screenshot-v1-${index}`;
+    if(DUPLICATE_SCREENSHOT_IMPORT_KEYS.has(importKey))return;
     if(target && !target.items.some(it=>it.importKey===importKey)){
       target.items.push({cat,space,name,brand:"",budget:0,paid,unpaid:0,date,status:"已完成",note:note||"截图补录",importKey});
     }
