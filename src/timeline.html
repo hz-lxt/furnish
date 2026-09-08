@@ -109,25 +109,35 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .stat-pill{display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800;border:1px solid var(--line)}
 .stat-pill.price{background:rgba(199,154,82,.13);color:#8B5E16;border-color:rgba(199,154,82,.28)}
 :root[data-theme="dark"] .stat-pill.price{color:#F0C77F}
-.detail-toggle{
+.branch-toggle{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);
   border-radius:9px;padding:10px 12px;background:rgba(255,255,255,.34);color:var(--dark);font:inherit;font-size:13px;font-weight:700;
   cursor:pointer;transition:background .2s,border-color .2s,transform .2s;
 }
-:root[data-theme="dark"] .detail-toggle{background:rgba(255,255,255,.06)}
-.detail-toggle:hover{background:rgba(199,154,82,.12);border-color:rgba(199,154,82,.46)}
-.detail-toggle:active{transform:scale(.99)}
-.toggle-icon{font-size:18px;line-height:1;transition:transform .25s}
-.detail-toggle[aria-expanded="true"] .toggle-icon{transform:rotate(180deg)}
-.details{margin-top:10px;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:rgba(255,255,255,.25)}
-:root[data-theme="dark"] .details{background:rgba(255,255,255,.035)}
-.details[hidden]{display:none}
-.detail-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
-.detail-row:last-child{border-bottom:none}
-.detail-name{min-width:0;font-size:13px;font-weight:750;color:var(--ink)}
-.detail-meta{display:block;margin-top:2px;color:var(--muted);font-size:11px;font-weight:500}
-.detail-price{font-size:13px;font-weight:900;color:var(--dark);font-variant-numeric:tabular-nums;white-space:nowrap}
-.detail-empty{padding:12px;color:var(--muted);font-size:12px;text-align:center}
+:root[data-theme="dark"] .branch-toggle{background:rgba(255,255,255,.06)}
+.branch-toggle:hover{background:rgba(199,154,82,.12);border-color:rgba(199,154,82,.46)}
+.branch-toggle:active{transform:scale(.99)}
+.branch-icon{font-size:18px;line-height:1;transition:transform .25s}
+.branch-toggle[aria-expanded="true"] .branch-icon{transform:rotate(45deg)}
+.branches{grid-row:1;position:relative;display:grid;align-content:center;gap:7px;min-width:0;padding:12px 0 12px 26px}
+.milestone:nth-child(odd) .branches{grid-column:3}
+.milestone:nth-child(even) .branches{grid-column:1;padding:12px 26px 12px 0}
+.branches[hidden]{display:none}
+.branches::before,.branches::after,.branch-item::before{content:"";position:absolute;background:rgba(199,154,82,.68)}
+.branches::before{left:-36px;top:50%;width:50px;height:2px}
+.branches::after{left:14px;top:22px;bottom:22px;width:2px}
+.milestone:nth-child(even) .branches::before{left:auto;right:-36px}
+.milestone:nth-child(even) .branches::after{left:auto;right:14px}
+.branch-item{
+  position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;
+  padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 5px 14px var(--shadow);
+}
+.branch-item::before{left:-12px;top:50%;width:12px;height:2px}
+.milestone:nth-child(even) .branch-item::before{left:auto;right:-12px}
+.branch-name{min-width:0;color:var(--ink);font-size:12px;font-weight:700;line-height:1.3;word-break:break-word}
+.branch-price{color:var(--dark);font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.branch-empty{padding:10px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:12px;text-align:center;background:var(--card)}
+.milestone.current .branch-item{border-color:rgba(232,154,31,.58);box-shadow:0 6px 18px rgba(199,91,24,.16)}
 @media(max-width:760px){
   .hero h1{font-size:26px}
   .timeline::before{left:26px}
@@ -136,6 +146,10 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
   .rail{grid-column:1}
   .node{width:44px;height:44px;font-size:12px}
   .milestone.current .node{transform:scale(1.06)}
+  .milestone:nth-child(odd) .branches,.milestone:nth-child(even) .branches{grid-column:2;grid-row:2;padding:10px 0 0 24px}
+  .milestone:nth-child(odd) .branches::before,.milestone:nth-child(even) .branches::before{left:-36px;right:auto;top:27px;width:50px}
+  .milestone:nth-child(odd) .branches::after,.milestone:nth-child(even) .branches::after{left:14px;right:auto;top:20px;bottom:12px}
+  .milestone:nth-child(odd) .branch-item::before,.milestone:nth-child(even) .branch-item::before{left:-10px;right:auto;width:10px}
   .countdown{align-items:flex-start;flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){
@@ -250,13 +264,11 @@ function renderTimeline(budgetStages){
     const stageItems=stageGroups[index];
     const resolvedState=resolvedStates[index];
     const totalSpent=stageItems.reduce((sum,entry)=>sum+(Number(entry.paid)||0),0);
-    const details=stageItems.length?stageItems.map(entry=>`
-      <div class="detail-row">
-        <div class="detail-name">${escapeHTML(entry.name||entry.cat||"未命名子项")}
-          <span class="detail-meta">${escapeHTML([entry.cat,entry.space].filter(Boolean).join(" · "))}${Number(entry.budget)>0?` · 预算 ${formatMoney(entry.budget)}`:""}</span>
-        </div>
-        <div class="detail-price">已花费 ${formatMoney(entry.paid)}</div>
-      </div>`).join(""):`<div class="detail-empty">${hasBudgetData?"该阶段暂无预算子项":"预算数据暂时无法读取"}</div>`;
+    const branches=stageItems.length?stageItems.map(entry=>`
+      <div class="branch-item">
+        <span class="branch-name">${escapeHTML(entry.name||entry.cat||"未命名子项")}</span>
+        <strong class="branch-price">${formatMoney(entry.paid)}</strong>
+      </div>`).join(""):`<div class="branch-empty">${hasBudgetData?"暂无子项":"数据暂时无法读取"}</div>`;
     return `
     <article class="milestone ${stateClass(resolvedState)}">
       <div class="panel">
@@ -266,25 +278,25 @@ function renderTimeline(budgetStages){
         <div class="stage-stats">
           <span class="stat-pill price">阶段花费 ${hasBudgetData?formatMoney(totalSpent):"待定"}</span>
         </div>
-        <button class="detail-toggle" type="button" aria-expanded="false" aria-controls="details-${index}">
-          <span>展开全部子项 · ${stageItems.length} 项</span><span class="toggle-icon">⌄</span>
+        <button class="branch-toggle" type="button" aria-expanded="false" aria-controls="branches-${index}">
+          <span>查看子项 · ${stageItems.length} 项</span><span class="branch-icon">＋</span>
         </button>
-        <div class="details" id="details-${index}" hidden>${details}</div>
       </div>
       <div class="rail"><div class="node">${escapeHTML(item.icon)}</div></div>
+      <div class="branches" id="branches-${index}" hidden>${branches}</div>
     </article>`}).join('');
 }
 renderCountdown();
 setInterval(renderCountdown,1000);
 updateThemeButton();
 document.getElementById("timeline").addEventListener("click",event=>{
-  const button=event.target.closest(".detail-toggle");
+  const button=event.target.closest(".branch-toggle");
   if(!button)return;
-  const details=document.getElementById(button.getAttribute("aria-controls"));
+  const branches=document.getElementById(button.getAttribute("aria-controls"));
   const expanded=button.getAttribute("aria-expanded")==="true";
   button.setAttribute("aria-expanded",String(!expanded));
-  button.querySelector("span:first-child").textContent=`${expanded?"展开":"收起"}全部子项 · ${details.querySelectorAll(".detail-row").length} 项`;
-  details.hidden=expanded;
+  button.querySelector("span:first-child").textContent=`${expanded?"查看":"收起"}子项 · ${branches.querySelectorAll(".branch-item").length} 项`;
+  branches.hidden=expanded;
 });
 async function initTimeline(){
   renderTimeline(await loadBudgetStages());
