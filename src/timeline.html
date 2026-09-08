@@ -53,16 +53,16 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .countdown-unit:first-child .countdown-num{min-width:3.8ch}
 .countdown-label{font-size:11px;color:var(--muted);font-weight:700}
 .timeline-wrap{max-width:1120px;margin:0 auto;padding:16px 20px 44px;position:relative}
-.timeline{position:relative;display:grid;gap:22px}
+.timeline{--branch-canvas-height:310px;position:relative;display:grid;gap:22px}
 .timeline::before{
   content:"";position:absolute;left:50%;top:8px;bottom:8px;width:2px;transform:translateX(-50%);
   background:linear-gradient(transparent,var(--gold),var(--blue),transparent);
 }
-.milestone{display:grid;grid-template-columns:1fr 72px 1fr;align-items:center;opacity:0;transform:translateY(28px);transition:.6s cubic-bezier(.2,.8,.2,1)}
+.milestone{display:grid;grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);min-height:var(--branch-canvas-height);align-items:stretch;opacity:0;transform:translateY(28px);transition:.6s cubic-bezier(.2,.8,.2,1)}
 .milestone.in{opacity:1;transform:translateY(0)}
 .milestone:nth-child(odd) .panel{grid-column:1}
 .milestone:nth-child(even) .panel{grid-column:3}
-.rail{grid-column:2;grid-row:1;display:flex;justify-content:center;position:relative;z-index:2}
+.rail{grid-column:2;grid-row:1;align-self:center;display:flex;justify-content:center;position:relative;z-index:2}
 .node{
   width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;font-weight:900;letter-spacing:1px;
   background:linear-gradient(135deg,var(--green),var(--blue));border:3px solid rgba(255,255,255,.72);
@@ -78,7 +78,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 }
 @keyframes pulse{50%{box-shadow:0 16px 36px rgba(199,91,24,.48),0 0 0 16px rgba(244,182,64,.18)}}
 .panel{
-  position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:8px;
+  position:relative;align-self:center;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:8px;
   backdrop-filter:blur(20px) saturate(145%);-webkit-backdrop-filter:blur(20px) saturate(145%);
   box-shadow:0 12px 30px var(--shadow),inset 0 1px rgba(255,255,255,.28);padding:18px;transition:.3s cubic-bezier(.2,.8,.2,1);
 }
@@ -119,10 +119,11 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .branch-toggle:active{transform:scale(.99)}
 .branch-icon{font-size:18px;line-height:1;transition:transform .25s}
 .branch-toggle[aria-expanded="true"] .branch-icon{transform:rotate(45deg)}
-.branches{grid-row:1;position:relative;display:grid;align-content:center;gap:7px;min-width:0;padding:12px 0 12px 26px}
+.branches{grid-row:1;position:relative;display:grid;align-content:center;gap:6px;min-width:0;height:var(--branch-canvas-height);padding:12px 0 12px 26px;opacity:1;transition:opacity .2s ease}
 .milestone:nth-child(odd) .branches{grid-column:3}
 .milestone:nth-child(even) .branches{grid-column:1;padding:12px 26px 12px 0}
-.branches[hidden]{display:none}
+.branches[hidden]{display:grid!important;visibility:hidden;opacity:0;pointer-events:none}
+.branches.dense{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;row-gap:5px}
 .branches::before,.branches::after,.branch-item::before{content:"";position:absolute;background:rgba(199,154,82,.68)}
 .branches::before{left:-36px;top:50%;width:50px;height:2px}
 .branches::after{left:14px;top:22px;bottom:22px;width:2px}
@@ -130,7 +131,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .milestone:nth-child(even) .branches::after{left:auto;right:14px}
 .branch-item{
   position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;
-  padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 5px 14px var(--shadow);
+  padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 5px 14px var(--shadow);
 }
 .branch-item::before{left:-12px;top:50%;width:12px;height:2px}
 .milestone:nth-child(even) .branch-item::before{left:auto;right:-12px}
@@ -141,12 +142,14 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 @media(max-width:760px){
   .hero h1{font-size:26px}
   .timeline::before{left:26px}
-  .milestone{grid-template-columns:52px 1fr;gap:10px;align-items:start}
+  .timeline{--branch-canvas-height:280px}
+  .milestone{grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:start}
   .milestone:nth-child(odd) .panel,.milestone:nth-child(even) .panel{grid-column:2}
   .rail{grid-column:1}
   .node{width:44px;height:44px;font-size:12px}
   .milestone.current .node{transform:scale(1.06)}
-  .milestone:nth-child(odd) .branches,.milestone:nth-child(even) .branches{grid-column:2;grid-row:2;padding:10px 0 0 24px}
+  .milestone:nth-child(odd) .branches,.milestone:nth-child(even) .branches{grid-column:2;grid-row:2;height:var(--branch-canvas-height);padding:10px 0 0 24px}
+  .branches.dense{column-gap:10px;row-gap:5px}
   .milestone:nth-child(odd) .branches::before,.milestone:nth-child(even) .branches::before{left:-36px;right:auto;top:27px;width:50px}
   .milestone:nth-child(odd) .branches::after,.milestone:nth-child(even) .branches::after{left:14px;right:auto;top:20px;bottom:12px}
   .milestone:nth-child(odd) .branch-item::before,.milestone:nth-child(even) .branch-item::before{left:-10px;right:auto;width:10px}
@@ -264,6 +267,7 @@ function renderTimeline(budgetStages){
     const stageItems=stageGroups[index];
     const resolvedState=resolvedStates[index];
     const totalSpent=stageItems.reduce((sum,entry)=>sum+(Number(entry.paid)||0),0);
+    const branchLayout=stageItems.length>5?" dense":"";
     const branches=stageItems.length?stageItems.map(entry=>`
       <div class="branch-item">
         <span class="branch-name">${escapeHTML(entry.name||entry.cat||"未命名子项")}</span>
@@ -283,7 +287,7 @@ function renderTimeline(budgetStages){
         </button>
       </div>
       <div class="rail"><div class="node">${escapeHTML(item.icon)}</div></div>
-      <div class="branches" id="branches-${index}" hidden>${branches}</div>
+      <div class="branches${branchLayout}" id="branches-${index}" hidden>${branches}</div>
     </article>`}).join('');
 }
 renderCountdown();
