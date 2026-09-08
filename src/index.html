@@ -207,9 +207,11 @@ tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
   position:relative;display:block;margin:2px;min-width:138px;border-radius:8px;
 }
 .date-picker .date-input{
-  position:absolute;z-index:2;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;
+  display:block;width:100%;min-height:38px;margin:0;padding:9px 11px;border:1px solid transparent;border-radius:8px;
+  background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(199,154,82,.1));color:var(--ink);cursor:pointer;
+  font:700 12px/1.2 inherit;font-variant-numeric:tabular-nums;box-shadow:inset 0 -1px rgba(199,154,82,.16);
 }
-.date-display{
+.date-display{display:none;
   display:flex;align-items:center;gap:7px;min-height:38px;padding:9px 11px;border:1px solid transparent;border-radius:8px;pointer-events:none;
   background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(199,154,82,.1));color:var(--ink);
   font-weight:700;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;box-shadow:inset 0 -1px rgba(199,154,82,.16);
@@ -669,9 +671,9 @@ function renderKPI(){
 
 // ====== 表格渲染 ======
 const COLS=[
-  {k:'cat',t:'类别'},{k:'space',t:'空间'},{k:'name',t:'项目名称'},{k:'brand',t:'品牌/规格'},
-  {k:'budget',t:'预算款',cls:'money budget'},{k:'paid',t:'已付款',cls:'money paid'},
-  {k:'date',t:'日期'},{k:'status',t:'状态'},{k:'note',t:'备注'}
+  {k:'cat',t:'类别'},{k:'space',t:'空间'},{k:'name',t:'项目名称'},{k:'date',t:'日期'},
+  {k:'status',t:'状态'},{k:'brand',t:'品牌/规格'},
+  {k:'budget',t:'预算款',cls:'money budget'},{k:'paid',t:'已付款',cls:'money paid'},{k:'note',t:'备注'}
 ];
 // 回款节点专属列：不显示预算/状态，只展示回收款
 const REBATE_COLS=[
