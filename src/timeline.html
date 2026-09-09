@@ -131,8 +131,11 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 .milestone:nth-child(even) .branches::after{left:auto;right:14px}
 .branch-item{
   position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;
-  padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 5px 14px var(--shadow);
+  padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 5px 14px var(--shadow);cursor:grab;touch-action:manipulation;
 }
+.branch-item:active{cursor:grabbing}
+.branch-item.dragging{opacity:.42;border-color:var(--gold);box-shadow:0 0 0 3px rgba(199,154,82,.2)}
+.branch-item.drag-over{border-color:var(--gold);box-shadow:0 0 0 3px rgba(199,154,82,.18)}
 .branch-item::before{left:-12px;top:50%;width:12px;height:2px}
 .milestone:nth-child(even) .branch-item::before{left:auto;right:-12px}
 .branch-name{min-width:0;color:var(--ink);font-size:12px;font-weight:700;line-height:1.3;word-break:break-word}
@@ -184,6 +187,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
 <script>
 const MOVE_IN_TARGET=new Date("2027-01-01T00:00:00+08:00").getTime();
 const BUDGET_STORAGE_KEY="yxsl_budget_v7";
+const TIMELINE_ORDER_KEY="yxsl_timeline_branch_order_v1";
 const ITEMS=[
   {date:"2026年4-5月",icon:"交付",title:"房屋交付前",state:"已完成",stageKeys:["01 房屋交付前"],text:"验房、设计、物业手续先落地，预算表从这里开始。"},
   {date:"2026年5-6月",icon:"拆改",title:"开工准备与拆改",state:"已完成",stageKeys:["02 开工准备与拆改"],text:"施工节奏启动，拆改、封窗、砌筑这些基础动作先走完。"},
@@ -199,6 +203,35 @@ const ITEMS=[
 const money=new Intl.NumberFormat("zh-CN",{style:"currency",currency:"CNY",minimumFractionDigits:0,maximumFractionDigits:1});
 const escapeHTML=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[char]);
 const formatMoney=value=>money.format(Number(value)||0).replace("CN¥","¥");
+function getBranchOrders(){
+  try{return JSON.parse(localStorage.getItem(TIMELINE_ORDER_KEY)||"{}")}catch(error){return {}}
+}
+function saveBranchOrders(orders){
+  try{localStorage.setItem(TIMELINE_ORDER_KEY,JSON.stringify(orders))}catch(error){console.warn("保存子项顺序失败",error)}
+}
+function branchDate(entry){
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(entry.date||""))?entry.date:"";
+}
+function chronologicalBranches(entries){
+  return [...entries].sort((a,b)=>{
+    const aDate=branchDate(a.entry),bDate=branchDate(b.entry);
+    if(!aDate&&!bDate)return a.originalIndex-b.originalIndex;
+    if(!aDate)return -1;
+    if(!bDate)return 1;
+    return aDate.localeCompare(bDate)||a.originalIndex-b.originalIndex;
+  });
+}
+function orderedBranches(entries,milestoneIndex){
+  const defaults=chronologicalBranches(entries);
+  const order=getBranchOrders()[milestoneIndex];
+  if(!Array.isArray(order)||!order.length)return defaults;
+  const positions=new Map(order.map((id,index)=>[id,index]));
+  return [...defaults].sort((a,b)=>{
+    const aPosition=positions.has(a.id)?positions.get(a.id):Number.MAX_SAFE_INTEGER;
+    const bPosition=positions.has(b.id)?positions.get(b.id):Number.MAX_SAFE_INTEGER;
+    return aPosition-bPosition||defaults.indexOf(a)-defaults.indexOf(b);
+  });
+}
 function stateClass(state){
   if(state==="已完成")return "completed";
   if(state==="进行中")return "current";
@@ -261,15 +294,18 @@ function renderCountdown(){
 }
 function renderTimeline(budgetStages){
   const hasBudgetData=budgetStages.length>0;
-  const stageGroups=ITEMS.map(item=>budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap(stage=>stage.items||[]));
-  const resolvedStates=resolveStates(stageGroups);
+  const stageGroups=ITEMS.map(item=>budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap((stage,stageIndex)=>(stage.items||[]).map((entry,itemIndex)=>({
+    entry,id:`${stage.stage}|${entry.date||""}|${entry.name||""}|${entry.paid||0}|${stageIndex}|${itemIndex}`,originalIndex:itemIndex
+  }))));
+  const resolvedStates=resolveStates(stageGroups.map(group=>group.map(branch=>branch.entry)));
   document.getElementById('timeline').innerHTML=ITEMS.map((item,index)=>{
-    const stageItems=stageGroups[index];
+    const branchEntries=orderedBranches(stageGroups[index],index);
+    const stageItems=branchEntries.map(branch=>branch.entry);
     const resolvedState=resolvedStates[index];
     const totalSpent=stageItems.reduce((sum,entry)=>sum+(Number(entry.paid)||0),0);
     const branchLayout=stageItems.length>5?" dense":"";
-    const branches=stageItems.length?stageItems.map(entry=>`
-      <div class="branch-item">
+    const branches=stageItems.length?branchEntries.map(({entry,id})=>`
+      <div class="branch-item" draggable="true" data-branch-id="${escapeHTML(id)}" title="长按或拖拽以调整顺序">
         <span class="branch-name">${escapeHTML(entry.name||entry.cat||"未命名子项")}</span>
         <strong class="branch-price">${formatMoney(entry.paid)}</strong>
       </div>`).join(""):`<div class="branch-empty">${hasBudgetData?"暂无子项":"数据暂时无法读取"}</div>`;
@@ -302,6 +338,77 @@ document.getElementById("timeline").addEventListener("click",event=>{
   button.querySelector("span:first-child").textContent=`${expanded?"查看":"收起"}子项 · ${branches.querySelectorAll(".branch-item").length} 项`;
   branches.hidden=expanded;
 });
+function persistBranchOrder(container){
+  const milestoneIndex=Number(container.id.replace("branches-",""));
+  if(!Number.isInteger(milestoneIndex))return;
+  const orders=getBranchOrders();
+  orders[milestoneIndex]=[...container.querySelectorAll(".branch-item")].map(item=>item.dataset.branchId);
+  saveBranchOrders(orders);
+}
+function placeBranch(dragged,target,clientY){
+  if(!dragged||!target||dragged===target||dragged.parentElement!==target.parentElement)return;
+  const rect=target.getBoundingClientRect();
+  target.parentElement.insertBefore(dragged,clientY<rect.top+rect.height/2?target:target.nextSibling);
+}
+let touchDrag=null;
+document.getElementById("timeline").addEventListener("dragstart",event=>{
+  const item=event.target.closest(".branch-item");
+  if(!item)return;
+  item.classList.add("dragging");
+  event.dataTransfer.effectAllowed="move";
+  event.dataTransfer.setData("text/plain",item.dataset.branchId);
+});
+document.getElementById("timeline").addEventListener("dragover",event=>{
+  const target=event.target.closest(".branch-item");
+  const dragged=document.querySelector(".branch-item.dragging");
+  if(!target||!dragged||target.parentElement!==dragged.parentElement)return;
+  event.preventDefault();
+  target.parentElement.querySelectorAll(".drag-over").forEach(item=>item.classList.remove("drag-over"));
+  if(target!==dragged)target.classList.add("drag-over");
+});
+document.getElementById("timeline").addEventListener("drop",event=>{
+  const target=event.target.closest(".branch-item");
+  const dragged=document.querySelector(".branch-item.dragging");
+  if(!target||!dragged||target.parentElement!==dragged.parentElement)return;
+  event.preventDefault();
+  placeBranch(dragged,target,event.clientY);
+  persistBranchOrder(target.parentElement);
+  target.parentElement.querySelectorAll(".drag-over").forEach(item=>item.classList.remove("drag-over"));
+});
+document.getElementById("timeline").addEventListener("dragend",event=>{
+  const item=event.target.closest(".branch-item");
+  item?.classList.remove("dragging");
+  item?.parentElement?.querySelectorAll(".drag-over").forEach(target=>target.classList.remove("drag-over"));
+});
+document.getElementById("timeline").addEventListener("pointerdown",event=>{
+  if(event.pointerType==="mouse")return;
+  const item=event.target.closest(".branch-item");
+  if(!item)return;
+  const timer=setTimeout(()=>{
+    if(!touchDrag)return;
+    touchDrag.active=true;
+    item.classList.add("dragging");
+    item.setPointerCapture?.(event.pointerId);
+  },220);
+  touchDrag={item,pointerId:event.pointerId,timer,active:false};
+});
+document.getElementById("timeline").addEventListener("pointermove",event=>{
+  if(!touchDrag||touchDrag.pointerId!==event.pointerId||!touchDrag.active)return;
+  event.preventDefault();
+  const target=document.elementFromPoint(event.clientX,event.clientY)?.closest(".branch-item");
+  if(target&&target.parentElement===touchDrag.item.parentElement)placeBranch(touchDrag.item,target,event.clientY);
+});
+function finishTouchDrag(event){
+  if(!touchDrag||touchDrag.pointerId!==event.pointerId)return;
+  clearTimeout(touchDrag.timer);
+  if(touchDrag.active){
+    persistBranchOrder(touchDrag.item.parentElement);
+    touchDrag.item.classList.remove("dragging");
+  }
+  touchDrag=null;
+}
+document.getElementById("timeline").addEventListener("pointerup",finishTouchDrag);
+document.getElementById("timeline").addEventListener("pointercancel",finishTouchDrag);
 async function initTimeline(){
   renderTimeline(await loadBudgetStages());
   const io=new IntersectionObserver(entries=>entries.forEach(entry=>{
