@@ -500,10 +500,10 @@ const fmt = n => (Number(n)||0).toLocaleString('zh-CN',{maximumFractionDigits:2}
 const toast = msg => {const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);};
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-const dateValue = v => {
+function dateValue(v){
   const match=String(v||'').trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
   return match?`${match[1]}-${match[2].padStart(2,'0')}-${match[3].padStart(2,'0')}`:'';
-};
+}
 function formatDateLabel(v){
   const value=dateValue(v);
   if(!value) return '选择日期';
