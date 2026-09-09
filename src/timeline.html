@@ -134,7 +134,7 @@ body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;backgr
   padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);box-shadow:0 5px 14px var(--shadow);cursor:grab;touch-action:manipulation;
 }
 .branch-item:active{cursor:grabbing}
-.branch-item.dragging{opacity:.42;border-color:var(--gold);box-shadow:0 0 0 3px rgba(199,154,82,.2)}
+.branch-item.dragging{opacity:.42;border-color:var(--gold);box-shadow:0 0 0 3px rgba(199,154,82,.2);pointer-events:none}
 .branch-item.drag-over{border-color:var(--gold);box-shadow:0 0 0 3px rgba(199,154,82,.18)}
 .branch-item::before{left:-12px;top:50%;width:12px;height:2px}
 .milestone:nth-child(even) .branch-item::before{left:auto;right:-12px}
@@ -210,7 +210,9 @@ function saveBranchOrders(orders){
   try{localStorage.setItem(TIMELINE_ORDER_KEY,JSON.stringify(orders))}catch(error){console.warn("保存子项顺序失败",error)}
 }
 function branchDate(entry){
-  return /^\d{4}-\d{2}-\d{2}$/.test(String(entry.date||""))?entry.date:"";
+  const match=String(entry.date||"").trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if(!match)return "";
+  return `${match[1]}-${match[2].padStart(2,"0")}-${match[3].padStart(2,"0")}`;
 }
 function chronologicalBranches(entries){
   return [...entries].sort((a,b)=>{
@@ -294,8 +296,8 @@ function renderCountdown(){
 }
 function renderTimeline(budgetStages){
   const hasBudgetData=budgetStages.length>0;
-  const stageGroups=ITEMS.map(item=>budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap((stage,stageIndex)=>(stage.items||[]).map((entry,itemIndex)=>({
-    entry,id:`${stage.stage}|${entry.date||""}|${entry.name||""}|${entry.paid||0}|${stageIndex}|${itemIndex}`,originalIndex:itemIndex
+  const stageGroups=ITEMS.map(item=>budgetStages.filter(stage=>item.stageKeys.includes(stage.stage)).flatMap(stage=>(stage.items||[]).map((entry,itemIndex)=>({
+    entry,id:`${stage.stage}|${entry.date||""}|${entry.cat||""}|${entry.space||""}|${entry.name||""}|${entry.paid||0}|${entry.note||""}`,originalIndex:itemIndex
   }))));
   const resolvedStates=resolveStates(stageGroups.map(group=>group.map(branch=>branch.entry)));
   document.getElementById('timeline').innerHTML=ITEMS.map((item,index)=>{

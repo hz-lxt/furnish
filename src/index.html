@@ -500,7 +500,10 @@ const fmt = n => (Number(n)||0).toLocaleString('zh-CN',{maximumFractionDigits:2}
 const toast = msg => {const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);};
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-const dateValue = v => (/^\d{4}-\d{2}-\d{2}$/.test(String(v||'')) ? String(v) : '');
+const dateValue = v => {
+  const match=String(v||'').trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  return match?`${match[1]}-${match[2].padStart(2,'0')}-${match[3].padStart(2,'0')}`:'';
+};
 function formatDateLabel(v){
   const value=dateValue(v);
   if(!value) return '选择日期';
@@ -512,7 +515,7 @@ function normalizeData(data){
   const arr=Array.isArray(data)?data:[];
   arr.forEach(s=>s.items=(Array.isArray(s.items)?s.items:[])
     .filter(it=>!DUPLICATE_SCREENSHOT_IMPORT_KEYS.has(it.importKey))
-    .map(it=>({...it,unpaid:0})));
+    .map(it=>({...it,date:dateValue(it.date)||it.date,unpaid:0})));
   if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
     arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
   }
@@ -532,6 +535,13 @@ function normalizeData(data){
       target.items.push({cat,space,name,brand:"",budget:0,paid,unpaid:0,date,status:"已完成",note:"截图补录",importKey:`required-receipt-v2-${index}`});
     }
   });
+  arr.forEach(stage=>stage.items.sort((a,b)=>{
+    const aDate=dateValue(a.date),bDate=dateValue(b.date);
+    if(!aDate&&!bDate)return 0;
+    if(!aDate)return -1;
+    if(!bDate)return 1;
+    return aDate.localeCompare(bDate);
+  }));
   return arr;
 }
 
