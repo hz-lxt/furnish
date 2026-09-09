@@ -521,8 +521,6 @@ function formatDateLabel(v){
 function normalizeData(data){
   const arr=Array.isArray(data)?data:[];
   arr.forEach(s=>s.items=(Array.isArray(s.items)?s.items:[])
-    // 仅清理早期页面自动补录的本地缓存；云端人工维护的数据不做合并或覆盖。
-    .filter(it=>!/^screenshot-v1-|^required-receipt-v2-/.test(String(it.importKey||'')))
     .map(it=>{
       const normalized={...it,date:dateValue(it.date)||it.date,unpaid:it.unpaid??0};
       if(!s.noStat&&!s.kind&&Number(normalized.budget)===0&&Number(normalized.paid)>0){
