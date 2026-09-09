@@ -521,34 +521,18 @@ function formatDateLabel(v){
 function normalizeData(data){
   const arr=Array.isArray(data)?data:[];
   arr.forEach(s=>s.items=(Array.isArray(s.items)?s.items:[])
-    .filter(it=>!DUPLICATE_SCREENSHOT_IMPORT_KEYS.has(it.importKey))
-    .map(it=>({...it,date:dateValue(it.date)||it.date,unpaid:0})));
+    // 仅清理早期页面自动补录的本地缓存；云端人工维护的数据不做合并或覆盖。
+    .filter(it=>!/^screenshot-v1-|^required-receipt-v2-/.test(String(it.importKey||'')))
+    .map(it=>{
+      const normalized={...it,date:dateValue(it.date)||it.date,unpaid:it.unpaid??0};
+      if(!s.noStat&&!s.kind&&Number(normalized.budget)===0&&Number(normalized.paid)>0){
+        normalized.budget=Number(normalized.paid);
+      }
+      return normalized;
+    }));
   if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
     arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
   }
-  SCREENSHOT_IMPORT_V1.forEach((entry,index)=>{
-    const [stage,cat,space,name,paid,date,note=""] = entry;
-    const target=arr.find(s=>s.stage===stage);
-    const importKey=`screenshot-v1-${index}`;
-    if(DUPLICATE_SCREENSHOT_IMPORT_KEYS.has(importKey))return;
-    if(target && !target.items.some(it=>it.importKey===importKey)){
-      target.items.push({cat,space,name,brand:"",budget:0,paid,unpaid:0,date,status:"已完成",note:note||"截图补录",importKey});
-    }
-  });
-  REQUIRED_RECEIPTS_V2.forEach((entry,index)=>{
-    const [stage,cat,space,name,paid,date] = entry;
-    const target=arr.find(s=>s.stage===stage);
-    if(target && !target.items.some(it=>it.name===name&&it.date===date&&Number(it.paid)===paid)){
-      target.items.push({cat,space,name,brand:"",budget:0,paid,unpaid:0,date,status:"已完成",note:"截图补录",importKey:`required-receipt-v2-${index}`});
-    }
-  });
-  arr.forEach(stage=>stage.items.sort((a,b)=>{
-    const aDate=dateValue(a.date),bDate=dateValue(b.date);
-    if(!aDate&&!bDate)return 0;
-    if(!aDate)return -1;
-    if(!bDate)return 1;
-    return aDate.localeCompare(bDate);
-  }));
   return arr;
 }
 
