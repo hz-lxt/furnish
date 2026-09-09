@@ -196,7 +196,7 @@ tbody tr:hover .cell{background:transparent}
 .budget-row{animation:rowIn .24s cubic-bezier(.2,.8,.2,1) both}
 @keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
-.add-row-btn{width:100%;min-width:0;white-space:nowrap;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
+.add-row-btn{width:auto;min-width:154px;white-space:nowrap;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:var(--budget-bg)}
 .delete-row-btn{color:var(--red);border-color:rgba(201,82,82,.28);background:var(--card)}
 .delete-row-btn:hover{background:var(--unpaid-bg);transform:scale(1.06)}
@@ -818,7 +818,7 @@ function renderStages(){
             return `<th class="${cm?'thmoney':cc}">${c.t}</th>`;
           }).join('')}<th class="thcenter">操作</th></tr></thead>
           <tbody>${rows}</tbody>
-          <tfoot><tr><td><button class="btn btn-ghost btn-mini add-row-btn" data-si="${si}">+ 新增条目</button></td><td colspan="${cols.length}"></td></tr></tfoot>
+          <tfoot><tr><td colspan="3"><button class="btn btn-ghost btn-mini add-row-btn" data-si="${si}">+ 新增条目</button></td><td colspan="${cols.length-2}"></td></tr></tfoot>
         </table>
       </div>`;
     box.appendChild(el);
