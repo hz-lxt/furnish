@@ -164,7 +164,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage-sum{font-size:13px; color:#fff; display:flex; gap:16px; flex-wrap:wrap; z-index:1}
 .stage-sum span{background:rgba(255,255,255,.18); padding:3px 12px; border-radius:20px; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px)}
 .stage-sum b{color:#FFE1A6; font-weight:700}
-.table-wrap{background:var(--card); border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch; transition:max-height .4s ease, opacity .3s; box-shadow:0 4px 14px var(--shadow)}
+.table-wrap{background:var(--card); border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; overflow:hidden; transition:max-height .4s ease, opacity .3s; box-shadow:0 4px 14px var(--shadow)}
 /* 回款节点：区别于普通节点的配色 */
 .stage.rebate .stage-head{background:linear-gradient(100deg,#7A5B12 0%,#A97E22 60%,#C79A52 100%)}
 .stage.rebate thead th{background:#8A6A1C}
@@ -175,7 +175,7 @@ header p{color:rgba(255,255,255,.8); font-size:13px; margin-top:6px; animation:s
 .stage.saving td.saving .cell{background:var(--saving-soft);color:var(--saving);font-weight:800}
 .stage.saving .stage-sum b{color:#D8F6FF}
 .stage.collapsed .table-wrap{max-height:0!important; opacity:0; border:none}
-table{width:100%;min-width:1040px; border-collapse:collapse; font-size:13px}
+table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}
 thead th{
   background:var(--header-start); color:#fff; font-weight:600; padding:12px 12px; text-align:left;
   position:sticky; top:0; white-space:nowrap; font-size:12px;
@@ -183,8 +183,10 @@ thead th{
 thead th:first-child{padding-left:22px}
 thead th.thmoney{text-align:right; padding-right:22px}
 thead th.thcenter{text-align:center}
-thead th:nth-child(2),tbody td:nth-child(2){min-width:62px}
-thead th:nth-child(8),tbody td:nth-child(8){min-width:104px}
+thead th{overflow:hidden;text-overflow:ellipsis}
+thead th:nth-child(1){width:7%} thead th:nth-child(2){width:7%} thead th:nth-child(3){width:16%}
+thead th:nth-child(4){width:14%} thead th:nth-child(5){width:10%} thead th:nth-child(6){width:12%}
+thead th:nth-child(7),thead th:nth-child(8){width:8%} thead th:nth-child(9){width:10%} thead th:last-child{width:8%}
 tbody td:first-child .cell{margin-left:12px}
 tbody td.money .cell{margin-right:12px}
 tbody td{padding:0; border-bottom:1px solid var(--line); vertical-align:middle}
@@ -194,17 +196,17 @@ tbody tr:hover .cell{background:transparent}
 .budget-row{animation:rowIn .24s cubic-bezier(.2,.8,.2,1) both}
 @keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
-.add-row-btn{width:100%;min-width:132px;white-space:nowrap;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
+.add-row-btn{width:100%;min-width:0;white-space:nowrap;text-align:left;background:var(--card);color:var(--dark);border:1px dashed var(--gold)}
 .add-row-btn:hover{background:var(--budget-bg)}
 .delete-row-btn{color:var(--red);border-color:rgba(201,82,82,.28);background:var(--card)}
 .delete-row-btn:hover{background:var(--unpaid-bg);transform:scale(1.06)}
 .cell{
   padding:10px; min-height:38px; cursor:text; transition:.15s; outline:none;
   border:2px solid transparent; border-radius:6px; margin:2px;
-  flex:1; white-space:nowrap; box-shadow:inset 0 -1px rgba(199,154,82,.18);
+  flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:inset 0 -1px rgba(199,154,82,.18);
 }
 .date-picker{
-  position:relative;display:block;margin:2px;min-width:138px;border-radius:8px;
+  position:relative;display:block;margin:2px;min-width:0;border-radius:8px;
 }
 .date-picker .date-input{
   display:block;width:100%;min-height:38px;margin:0;padding:9px 11px;border:1px solid transparent;border-radius:8px;
@@ -225,7 +227,8 @@ tfoot td{border-top:1px solid var(--line);background:var(--bg);padding:8px 12px}
 .cell.saved{animation:flash .7s}
 @keyframes flash{0%{background:#C6EFCE}100%{background:transparent}}
 tbody td:nth-child(2) .cell,tbody td:nth-child(8) .cell,.tdstatus{white-space:nowrap}
-.tdactions{text-align:center;white-space:nowrap;min-width:74px}
+.tdactions{width:8%;text-align:center;white-space:nowrap}
+.delete-row-btn{padding:6px 8px;min-width:0}
 td.money .cell{text-align:right; font-variant-numeric:tabular-nums; color:var(--ink)}
 td.budget .cell{background:var(--budget-bg)}
 td.paid .cell{color:var(--green); font-weight:600}
@@ -329,14 +332,18 @@ td.unpaid .cell{color:var(--red); font-weight:600}
   .search{min-width:0;flex:1 1 100%}
   .chip{flex:1;text-align:center}
   .btn{flex:1;padding:10px 8px;font-size:13px}
-  /* 表格横向滚动，保留所有列 */
+  /* 紧凑表格：保持操作列可见，不产生横向滚动 */
   .stage:not(.collapsed) .table-wrap{max-height:none}
-  table{min-width:1040px}
+  table{font-size:11px}
+  .budget-table th:nth-child(6),.budget-table td:nth-child(6),.budget-table th:nth-child(9),.budget-table td:nth-child(9){display:none}
+  .budget-table th:nth-child(1){width:9%}.budget-table th:nth-child(2){width:9%}.budget-table th:nth-child(3){width:22%}
+  .budget-table th:nth-child(4){width:20%}.budget-table th:nth-child(5){width:13%}.budget-table th:nth-child(7),.budget-table th:nth-child(8){width:9%}.budget-table th:last-child{width:9%}
   .stage-head{padding:12px 16px;flex-wrap:wrap;gap:8px}
   .stage-head h2{font-size:15px}
   .stage-sum{font-size:11px;gap:6px}
   .stage-sum span{padding:2px 8px}
-  .cell{font-size:12px;padding:9px 8px;min-height:40px}
+  .cell{font-size:12px;padding:9px 6px;min-height:40px}
+  .date-picker .date-input{padding:9px 5px;font-size:11px}
   .header-actions{align-items:stretch;flex-wrap:nowrap;gap:8px}
   .countdown{align-items:flex-start;border-radius:12px;flex:1;flex-direction:column;gap:6px;padding:8px 10px}
   .countdown-time{flex-wrap:wrap}
@@ -822,7 +829,7 @@ function renderStages(){
         </div>
       </div>
       <div class="table-wrap">
-        <table>
+        <table class="${isSaving?'saving-table':(isRebate?'rebate-table':'budget-table')}">
           <thead><tr>${cols.map(c=>{
             const cm=c.cls&&c.cls.includes('money');
             const cc=(c.k==='status')?'thcenter':'';
