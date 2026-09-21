@@ -224,6 +224,9 @@ function branchDisplayAmount(entry){
 }
 function priceDescendingBranches(entries){
   return [...entries].sort((a,b)=>{
+    const aCompleted=a.entry.status==="已完成";
+    const bCompleted=b.entry.status==="已完成";
+    if(aCompleted!==bCompleted)return aCompleted?-1:1;
     return branchDisplayAmount(b.entry)-branchDisplayAmount(a.entry)||a.originalIndex-b.originalIndex;
   });
 }

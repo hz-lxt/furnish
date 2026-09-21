@@ -531,7 +531,32 @@ function normalizeData(data){
   if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
     arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
   }
+  syncZeroCostSavings(arr);
   return arr;
+}
+function zeroCostSavingKey(stage,item){
+  return [stage.stage,item.cat||"",item.space||"",item.name||"",item.brand||"",item.date||"",Number(item.budget)||0].join("|");
+}
+function syncZeroCostSavings(data){
+  const savingStage=data.find(stage=>stage.kind==="savings"||stage.stage==="特别省下的钱");
+  if(!savingStage)return;
+  const recorded=new Set((savingStage.items||[]).map(item=>item.savingSource).filter(Boolean));
+  data.forEach(stage=>{
+    if(stage.noStat||stage.kind==="savings")return;
+    (stage.items||[]).forEach(item=>{
+      const budget=Number(item.budget)||0;
+      const paid=Number(item.paid)||0;
+      if(item.status!=="已完成"||paid!==0||budget<=0)return;
+      const savingSource=zeroCostSavingKey(stage,item);
+      if(recorded.has(savingSource))return;
+      savingStage.items.push({
+        cat:"零消费",space:item.space||"",name:`${stage.stage.replace(/^\d+\s*/,"")} · ${item.name||item.cat||"未命名项目"}`,
+        brand:item.brand||"",budget:0,paid:0,unpaid:0,saved:budget,date:item.date||"",status:"已完成",
+        note:"已完成且实际消费为 ¥0，按预算计入节省",savingSource
+      });
+      recorded.add(savingSource);
+    });
+  });
 }
 
 function cloudHeaders(){
@@ -875,6 +900,7 @@ function bindStatusBadge(b){
     const nv=cur==='已完成'?'未完成':'已完成';
     if(!ensureEditAllowed()) return;
     DATA[si].items[ii].status=nv;
+    if(nv==='已完成')syncZeroCostSavings(DATA);
     saveData();
     this.textContent=nv;
     this.className='status-badge '+(nv==='已完成'?'done':'todo');
