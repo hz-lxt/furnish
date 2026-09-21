@@ -236,6 +236,9 @@ function orderedBranches(entries,milestoneIndex){
   if(!Array.isArray(order)||!order.length)return defaults;
   const positions=new Map(order.map((id,index)=>[id,index]));
   return [...defaults].sort((a,b)=>{
+    const aCompleted=a.entry.status==="已完成";
+    const bCompleted=b.entry.status==="已完成";
+    if(aCompleted!==bCompleted)return aCompleted?-1:1;
     const aPosition=positions.has(a.id)?positions.get(a.id):Number.MAX_SAFE_INTEGER;
     const bPosition=positions.has(b.id)?positions.get(b.id):Number.MAX_SAFE_INTEGER;
     return aPosition-bPosition||defaults.indexOf(a)-defaults.indexOf(b);
