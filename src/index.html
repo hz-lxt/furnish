@@ -631,7 +631,14 @@ function applyCloudDoc(doc, quiet){
 async function initCloudData(){
   try{
     const doc = await fetchCloudDoc();
-    if(doc) applyCloudDoc(doc,true);
+    if(doc){
+      applyCloudDoc(doc,true);
+      if(reconciledPaidSavingsCount&&!sessionStorage.getItem(EDIT_PASS_KEY)){
+        toast(`已将 ${reconciledPaidSavingsCount} 项已付款项目移回原阶段，请输入编辑密码同步云端`);
+        if(getEditPassword()) queueCloudSave();
+        else toast("回填结果暂存在本机，输入编辑密码后可同步云端");
+      }
+    }
     setInterval(refreshCloudData,15000);
   }catch(e){
     console.warn(e);
