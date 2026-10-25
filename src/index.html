@@ -492,6 +492,8 @@ const REQUIRED_RECEIPTS_V2 = [
   ["07 主材与安装","石材","厨房","厨房石材",2100,"2026-09-01"],
   ["06 墙面与油漆","材料","全屋","油漆材料",3822,"2026-09-03"]
 ];
+const CONFIRMED_PAID_SAVINGS = new Set([2133,335,944,826,568,2000,500,2743,4768,4999,3000,6100]);
+let reconciledPaidSavingsCount=0;
 
 function loadData(){
   try{const s=localStorage.getItem(LS_KEY); if(s){const data=normalizeData(JSON.parse(s));localStorage.setItem(LS_KEY,JSON.stringify(data));return data;}}catch(e){}
@@ -531,15 +533,51 @@ function normalizeData(data){
   if(!arr.some(s=>s.kind==="savings" || s.stage==="特别省下的钱")){
     arr.push(JSON.parse(JSON.stringify(SAVING_STAGE)));
   }
+  reconciledPaidSavingsCount=reconcileConfirmedPaidSavings(arr);
   syncZeroCostSavings(arr);
   return arr;
 }
 function zeroCostSavingKey(stage,item){
   return [stage.stage,item.cat||"",item.space||"",item.name||"",item.brand||"",item.date||"",Number(item.budget)||0].join("|");
 }
+function reconcileConfirmedPaidSavings(data){
+  const savingStage=data.find(stage=>stage.kind==="savings"||stage.stage==="特别省下的钱");
+  if(!savingStage)return 0;
+  const savingsBySource=new Map((savingStage.items||[])
+    .filter(item=>item.savingSource&&CONFIRMED_PAID_SAVINGS.has(Number(item.saved)))
+    .map(item=>[item.savingSource,item]));
+  const restored=new Set();
+  let count=0;
+  data.forEach(stage=>{
+    if(stage.noStat||stage.kind==="savings")return;
+    (stage.items||[]).forEach(item=>{
+      const saving=savingsBySource.get(zeroCostSavingKey(stage,item));
+      if(!saving)return;
+      item.paid=Number(saving.saved)||Number(item.budget)||0;
+      item.unpaid=0;
+      item.status="已完成";
+      restored.add(saving);
+      count+=1;
+    });
+  });
+  if(restored.size){
+    savingStage.items=(savingStage.items||[]).filter(item=>!restored.has(item));
+  }
+  return count;
+}
 function syncZeroCostSavings(data){
   const savingStage=data.find(stage=>stage.kind==="savings"||stage.stage==="特别省下的钱");
   if(!savingStage)return;
+  const activeSources=new Set();
+  data.forEach(stage=>{
+    if(stage.noStat||stage.kind==="savings")return;
+    (stage.items||[]).forEach(item=>{
+      if(item.status==="已完成"&&(Number(item.paid)||0)===0&&(Number(item.budget)||0)>0){
+        activeSources.add(zeroCostSavingKey(stage,item));
+      }
+    });
+  });
+  savingStage.items=(savingStage.items||[]).filter(item=>!item.savingSource||activeSources.has(item.savingSource));
   const recorded=new Set((savingStage.items||[]).map(item=>item.savingSource).filter(Boolean));
   data.forEach(stage=>{
     if(stage.noStat||stage.kind==="savings")return;
@@ -579,7 +617,16 @@ function applyCloudDoc(doc, quiet){
   cloudUpdatedAt = doc.updated_at || cloudUpdatedAt;
   localStorage.setItem(LS_KEY, JSON.stringify(DATA));
   renderKPI(); renderStages();
-  if(!quiet) toast("已同步云端数据");
+  if(reconciledPaidSavingsCount){
+    const message=`已将 ${reconciledPaidSavingsCount} 项已付款项目移回原阶段`;
+    if(sessionStorage.getItem(EDIT_PASS_KEY)){
+      toast(`${message}，正在同步云端`);
+      queueCloudSave();
+    }else if(!quiet){
+      toast(`${message}，输入编辑密码后保存即可同步云端`);
+    }
+  }
+  if(!quiet&&!reconciledPaidSavingsCount) toast("已同步云端数据");
 }
 async function initCloudData(){
   try{
